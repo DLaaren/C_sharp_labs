@@ -1,4 +1,4 @@
-namespace Nsu.HackathonProblem.Contracts;
+namespace lab1;
 
 public class HRDirector
 {

@@ -1,11 +1,11 @@
-namespace Nsu.HackathonProblem.Contracts;
+namespace lab1;
 
 public class Hackathon
 {
     private List<Employee> _juniors = new();
     private List<Employee> _teamLeads = new();
-    private HRManager _hrManager = new();
-    private HRDirector _hrDirector = new();
+    private HRManager _hrManager;
+    private HRDirector _hrDirector;
     
     private List<Wishlist> _juniorsWishlists;
     private List<Wishlist> _teamLeadsWishlists;
@@ -15,8 +15,10 @@ public class Hackathon
     
     public double MeanSatisfactionIndex { get; private set; }
     
-    public Hackathon()
+    public Hackathon(HRManager hrManager, HRDirector hrDirector)
     {
+        _hrManager = hrManager;
+        _hrDirector = hrDirector;
         ParseCsvFileWithEmployees("Resources/Juniors20.csv", _juniors);
         ParseCsvFileWithEmployees("Resources/Teamleads20.csv", _teamLeads);
     }
