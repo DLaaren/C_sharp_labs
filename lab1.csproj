@@ -2,26 +2,21 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <LangVersion>preview</LangVersion>
     </PropertyGroup>
-
+    
     <ItemGroup>
-      <None Update="Resources\Juniors20.csv">
+      <None Update="resources\Juniors20.csv">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Resources\Teamleads20.csv">
+      <None Update="resources\Teamleads20.csv">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="appsettings.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Content Include="Nsu.HackathonProblem.Contracts.csproj" />
     </ItemGroup>
 
     <ItemGroup>
