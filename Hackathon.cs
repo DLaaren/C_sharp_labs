@@ -7,20 +7,20 @@ public class Hackathon
     private HRManager _hrManager;
     private HRDirector _hrDirector;
     
-    private List<Wishlist> _juniorsWishlists;
-    private List<Wishlist> _teamLeadsWishlists;
-    private List<Team> _teams;
+    private List<Wishlist>? _juniorsWishlists;
+    private List<Wishlist>? _teamLeadsWishlists;
+    private List<Team>? _teams;
     
     private double _meanSatisfactionIndex = -1;
     
-    public double MeanSatisfactionIndex { get; private set; }
-    
+    public double MeanSatisfactionIndex => _meanSatisfactionIndex;
+
     public Hackathon(HRManager hrManager, HRDirector hrDirector)
     {
         _hrManager = hrManager;
         _hrDirector = hrDirector;
-        ParseCsvFileWithEmployees("Resources/Juniors20.csv", _juniors);
-        ParseCsvFileWithEmployees("Resources/Teamleads20.csv", _teamLeads);
+        ParseCsvFileWithEmployees("resources/Juniors20.csv", _juniors);
+        ParseCsvFileWithEmployees("resources/Teamleads20.csv", _teamLeads);
     }
     
     private void ParseCsvFileWithEmployees(string filePath, IEnumerable<Employee> employees)
@@ -53,10 +53,7 @@ public class Hackathon
         var teams2 = (List<Team>)_hrManager.BuildTeams(_juniors, _teamLeads, _juniorsWishlists, _teamLeadsWishlists);
         double idx2 = _hrDirector.CalculateMeanSatisfactionIndex(_juniorsWishlists, _teamLeadsWishlists, teams2);
         
-        /*Console.WriteLine("is teams different: {0}", teams1.Equals(teams2));
-        Console.WriteLine("idx1 {0}; idx2 {1}", idx1, idx2);*/
-        
         _teams = idx1 > idx2 ? teams1 : teams2;
-        MeanSatisfactionIndex = idx1 > idx2 ? idx1 : idx2;
+        _meanSatisfactionIndex = idx1 > idx2 ? idx1 : idx2;
     }
 }

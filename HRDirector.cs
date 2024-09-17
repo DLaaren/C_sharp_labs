@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace lab1;
 
 public class HRDirector
@@ -15,14 +17,16 @@ public class HRDirector
         
         foreach (var team in teams)
         {
-            var teamLead = team.TeamLead;
-            var junior = team.Junior;
+            Employee teamLead = team.TeamLead;
+            Employee junior = team.Junior;
 
-            var teamLeadWishlist = teamLeadsWishlistsList.Find(w => w.EmployeeId == teamLead.Id);
-            var juniorWishlist = juniorsWishlistsList.Find(w => w.EmployeeId == junior.Id);
-
-            var teamLeadSatisfactionIndex = 20 - Array.FindIndex(teamLeadWishlist.DesiredEmployees, j => j == junior.Id);
-            var juniorSatisfactionIndex = 20 - Array.FindIndex(juniorWishlist.DesiredEmployees, t => t == teamLead.Id);
+            int[]? teamLeadWishlistIds = teamLeadsWishlistsList.Find(w => w.EmployeeId == teamLead.Id)?.DesiredEmployees;
+            Debug.Assert(teamLeadWishlistIds != null, nameof(teamLeadWishlistIds) + " != null");
+            int[]? juniorWishlistIds = juniorsWishlistsList.Find(w => w.EmployeeId == junior.Id)?.DesiredEmployees;
+            Debug.Assert(juniorWishlistIds != null, nameof(juniorWishlistIds) + " != null");
+            
+            var teamLeadSatisfactionIndex = 20 - Array.FindIndex(teamLeadWishlistIds, j => j == junior.Id);
+            var juniorSatisfactionIndex = 20 - Array.FindIndex(juniorWishlistIds, t => t == teamLead.Id);
 
             juniorsSatisfactionIndexes[junior.Id - 1] = juniorSatisfactionIndex;
             teamLeadsSatisfactionIndexes[teamLead.Id - 1] = teamLeadSatisfactionIndex;
