@@ -22,4 +22,8 @@
         </PackageReference>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\EveryoneToTheHackathon.DataContracts\EveryoneToTheHackathon.DataContracts.csproj" />
+    </ItemGroup>
+
 </Project>
