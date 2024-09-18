@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace lab1;
+namespace EveryoneToTheHackathon;
 
 public class HackathonService : IHostedService
 {

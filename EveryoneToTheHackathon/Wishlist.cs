@@ -1,2 +1,2 @@
-﻿namespace lab1;
+﻿namespace EveryoneToTheHackathon;
 public record Wishlist(int EmployeeId, int[] DesiredEmployees);

@@ -1,4 +1,4 @@
-namespace lab1;
+namespace EveryoneToTheHackathon;
 
 public class None : ITeamBuildingStrategy
 {

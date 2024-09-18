@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace lab1;
+namespace EveryoneToTheHackathon;
 
 public class HRDirector
 {

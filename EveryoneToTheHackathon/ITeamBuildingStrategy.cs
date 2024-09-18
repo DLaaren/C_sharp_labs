@@ -1,4 +1,4 @@
-﻿namespace lab1;
+﻿namespace EveryoneToTheHackathon;
 public interface ITeamBuildingStrategy
 {
     /// <summary>
