@@ -1,12 +1,14 @@
-﻿using EveryoneToTheHackathon.DataContracts;
+﻿using System.Text.Json;
+using EveryoneToTheHackathon.DataContracts;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Npgsql;
 
 namespace EveryoneToTheHackathon.Host;
-
-//TODO in another project
 
 public static class Program
 {
@@ -24,6 +26,18 @@ public static class Program
         
         HostApplicationBuilder builder = Microsoft.Extensions.Hosting.Host.CreateApplicationBuilder(settings);
         
+        string connString =
+            String.Format(
+                "Host={0};Port={1};Database={2};Username={3};Password={4};SSLMode=Prefer;Pooling=false",
+                settings.Configuration["Database:Host"] ?? throw new JsonException(),
+                settings.Configuration["Database:Port"] ?? throw new JsonException(),
+                settings.Configuration["Database:Database"] ?? throw new JsonException(),
+                settings.Configuration["Database:Username"] ?? throw new JsonException(),
+                settings.Configuration["Database:Password"] ?? throw new JsonException()
+                );
+        
+        ApplicationContext applicationContext = new ApplicationContext(connString);
+        
         /*
          * The order of registration has no affect
          */
@@ -34,11 +48,20 @@ public static class Program
                 1000
                 )
             );
+
+        List<Employee> teamLeads = (List<Employee>)CsvParser.ParseCsvFileWithEmployees(
+            settings.Configuration["Resources:TeamLeadsList"] ?? "Resources/Teamleads20.csv", EmployeeTitle.TeamLead);
+        List<Employee> juniors = (List<Employee>)CsvParser.ParseCsvFileWithEmployees(
+            settings.Configuration["Resources:JuniorsList"] ?? "Resources/Juniors20.csv", EmployeeTitle.Junior);
+
+        applicationContext.Employees.AddRange(teamLeads);
+        applicationContext.Employees.AddRange(juniors);
+        
         builder.Services.AddTransient<IHackathon, Hackathon>(
             h => new Hackathon(
-                CsvParser.ParseCsvFileWithEmployees(settings.Configuration["TeamLeadsList"] ?? "Resources/Teamleads20.csv"),
+                teamLeads,
                 20,
-                CsvParser.ParseCsvFileWithEmployees(settings.Configuration["JuniorsList"] ?? "Resources/Juniors20.csv"),
+                juniors,
                 20,
                 h.GetRequiredService<HRManager>(),
                 h.GetRequiredService<HRDirector>()
@@ -56,5 +79,6 @@ public static class Program
         
         IHost host = builder.Build();
         host.Run();
+        applicationContext.Database.CloseConnection();
     }
 }

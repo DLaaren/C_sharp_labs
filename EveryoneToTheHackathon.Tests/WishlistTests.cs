@@ -10,20 +10,21 @@ public class WishlistTests
         // Arrange
         var teamLeads = new List<Employee>
         {
-            new Employee(1, "John Doe"),
-            new Employee(2, "Jane Black"),
-            new Employee(3, "Bob Richman"),
-            new Employee(4, "Aboba Abobovich"),
-            new Employee(5, "Chuck Norris")
+            new Employee(1, EmployeeTitle.TeamLead, "John Doe"),
+            new Employee(2, EmployeeTitle.TeamLead, "Jane Black"),
+            new Employee(3, EmployeeTitle.TeamLead, "Bob Richman"),
+            new Employee(4, EmployeeTitle.TeamLead, "Aboba Abobovich"),
+            new Employee(5, EmployeeTitle.TeamLead, "Chuck Norris")
         };
         var juniors = new List<Employee>
         {
-            new Employee(1, "Walter White"),
-            new Employee(2, "Arnold Kindman"),
-            new Employee(3, "Jack Jones"),
-            new Employee(4, "Jane Jordan"),
-            new Employee(5, "Ken Kennedy")
+            new Employee(1, EmployeeTitle.Junior, "Walter White"),
+            new Employee(2, EmployeeTitle.Junior, "Arnold Kindman"),
+            new Employee(3, EmployeeTitle.Junior, "Jack Jones"),
+            new Employee(4, EmployeeTitle.Junior, "Jane Jordan"),
+            new Employee(5, EmployeeTitle.Junior, "Ken Kennedy")
         };
+
         
         // Act
         var teamLeadsWishlists = teamLeads.Select(teamlead => teamlead.MakeWishlist(juniors)).ToList();
@@ -40,20 +41,21 @@ public class WishlistTests
         // Arrange
         var teamLeads = new List<Employee>
         {
-            new Employee(1, "John Doe"),
-            new Employee(2, "Jane Black"),
-            new Employee(3, "Bob Richman"),
-            new Employee(4, "Aboba Abobovich"),
-            new Employee(5, "Chuck Norris")
+            new Employee(1, EmployeeTitle.TeamLead, "John Doe"),
+            new Employee(2, EmployeeTitle.TeamLead, "Jane Black"),
+            new Employee(3, EmployeeTitle.TeamLead, "Bob Richman"),
+            new Employee(4, EmployeeTitle.TeamLead, "Aboba Abobovich"),
+            new Employee(5, EmployeeTitle.TeamLead, "Chuck Norris")
         };
         var juniors = new List<Employee>
         {
-            new Employee(1, "Walter White"),
-            new Employee(2, "Arnold Kindman"),
-            new Employee(3, "Jack Jones"),
-            new Employee(4, "Jane Jordan"),
-            new Employee(5, "Ken Kennedy")
+            new Employee(1, EmployeeTitle.Junior, "Walter White"),
+            new Employee(2, EmployeeTitle.Junior, "Arnold Kindman"),
+            new Employee(3, EmployeeTitle.Junior, "Jack Jones"),
+            new Employee(4, EmployeeTitle.Junior, "Jane Jordan"),
+            new Employee(5, EmployeeTitle.Junior, "Ken Kennedy")
         };
+
         
         // Act
         var teamLeadsWishlists = teamLeads.Select(teamlead => teamlead.MakeWishlist(juniors)).ToList();
