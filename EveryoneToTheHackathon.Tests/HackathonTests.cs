@@ -56,6 +56,6 @@ public class HackathonTests
         hackathon.HoldEvent(teamLeadsWishlists, juniorsWishlists);
 
         // Assert = validate test's results
-        Assert.Equal(19.2, hackathon.MeanSatisfactionIndex);
+        Assert.Equal(4.2, hackathon.MeanSatisfactionIndex);
     }
 }

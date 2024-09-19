@@ -25,13 +25,18 @@ public class HRDirector
             int[]? juniorWishlistIds = juniorsWishlistsList.Find(w => w.EmployeeId == junior.Id)?.DesiredEmployees;
             Debug.Assert(juniorWishlistIds != null, nameof(juniorWishlistIds) + " != null");
             
-            var teamLeadSatisfactionIndex = 20 - Array.FindIndex(teamLeadWishlistIds, j => j == junior.Id);
-            var juniorSatisfactionIndex = 20 - Array.FindIndex(juniorWishlistIds, t => t == teamLead.Id);
+            var teamLeadSatisfactionIndex = teamLeadsWishlistsList.Count - Array.FindIndex(teamLeadWishlistIds, j => j == junior.Id);
+            var juniorSatisfactionIndex = juniorsWishlistsList.Count - Array.FindIndex(juniorWishlistIds, t => t == teamLead.Id);
 
             juniorsSatisfactionIndexes[junior.Id - 1] = juniorSatisfactionIndex;
             teamLeadsSatisfactionIndexes[teamLead.Id - 1] = teamLeadSatisfactionIndex;
         }
         
-        return (double)(juniorsSatisfactionIndexes.Sum() + teamLeadsSatisfactionIndexes.Sum()) / (juniorsSatisfactionIndexes.Length + teamLeadsSatisfactionIndexes.Length);
+        return CalculateMean(juniorsSatisfactionIndexes.Concat(teamLeadsSatisfactionIndexes), juniorsSatisfactionIndexes.Length + teamLeadsSatisfactionIndexes.Length);
+    }
+
+    private double CalculateMean(IEnumerable<int> numbers, int count)
+    {
+        return (double)numbers.Sum() / count;
     }
 }

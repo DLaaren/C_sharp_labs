@@ -9,8 +9,8 @@ public class Hackathon : IHackathon
     private readonly HRManager _hrManager;
     private readonly HRDirector _hrDirector;
     
-    private List<Wishlist> _juniorsWishlists;
-    private List<Wishlist> _teamLeadsWishlists;
+    private List<Wishlist>? _juniorsWishlists;
+    private List<Wishlist>? _teamLeadsWishlists;
     private List<Team>? _teams;
     
     private double _meanSatisfactionIndex = -1;
@@ -62,8 +62,5 @@ public class Hackathon : IHackathon
         _teams = idx1 > idx2 ? teams1 : teams2;
         _meanSatisfactionIndex = idx1 > idx2 ? idx1 : idx2;
         // TODO move to strategy
-
-        _teamLeadsWishlists = null;
-        _juniorsWishlists = null;
     }
 }
