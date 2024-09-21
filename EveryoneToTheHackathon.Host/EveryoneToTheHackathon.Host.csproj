@@ -27,7 +27,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\EveryoneToTheHackathon.DataContracts\EveryoneToTheHackathon.DataContracts.csproj" />
+      <ProjectReference Include="..\EveryoneToTheHackathon.Entities\EveryoneToTheHackathon.Entities.csproj" />
     </ItemGroup>
 
 </Project>

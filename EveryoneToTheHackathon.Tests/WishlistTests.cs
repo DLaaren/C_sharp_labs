@@ -1,4 +1,4 @@
-using EveryoneToTheHackathon.DataContracts;
+using EveryoneToTheHackathon.Entities;
 
 namespace EveryoneToTheHackathon.Tests;
 

@@ -1,4 +1,4 @@
-using EveryoneToTheHackathon.DataContracts;
+using EveryoneToTheHackathon.Entities;
 using Microsoft.Extensions.Hosting;
 
 namespace EveryoneToTheHackathon.Host;

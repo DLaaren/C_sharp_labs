@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>dotnet-EveryoneToTheHackathon.Services-66ac377f-0f65-4b7d-b9bd-d2a1924d32d2</UserSecretsId>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0-rc.1.24431.7" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\EveryoneToTheHackathon.Host\EveryoneToTheHackathon.Host.csproj" />
+    </ItemGroup>
+</Project>

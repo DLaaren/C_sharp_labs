@@ -1,5 +1,5 @@
 using System.Reflection;
-using EveryoneToTheHackathon.DataContracts;
+using EveryoneToTheHackathon.Entities;
 using Moq;
 using Xunit.Abstractions;
 
