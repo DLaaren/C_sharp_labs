@@ -1,4 +1,6 @@
 using EveryoneToTheHackathon.Entities;
+using EveryoneToTheHackathon.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -6,22 +8,38 @@ namespace EveryoneToTheHackathon.Host;
 
 public class HackathonHostedService : IHostedService
 {
+    private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<HackathonHostedService> _logger;
-    private readonly IHackathon _hackathon;
-    private readonly int _hackathonNumber;
+    private IHackathon? _hackathon;
+    private readonly int _hackathonRounds;
     
-    public HackathonHostedService(ILogger<HackathonHostedService> logger, IHackathon hackathon, int hackathonNumber)
+    private readonly IHackathonService _hackathonService;
+    private readonly IEmployeeService _employeeService;
+    private readonly IWishlistService _wishlistService;
+    private readonly ITeamService _teamService;
+    
+    public HackathonHostedService(IServiceProvider serviceProvider, ILogger<HackathonHostedService> logger, int hackathonRounds,
+        IHackathonService hackathonService, IEmployeeService employeeService, IWishlistService wishlistService, ITeamService teamService)
     {
+        _serviceProvider = serviceProvider;
         _logger = logger;
-        _hackathon = hackathon;
-        _hackathonNumber = hackathonNumber;
+        _hackathonRounds = hackathonRounds;
+        _hackathonService = hackathonService;
+        _employeeService = employeeService;
+        _wishlistService = wishlistService;
+        _teamService = teamService;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
         _logger.LogInformation("Starting HackathonHostedService");
-        MainTask(cancellationToken, _hackathonNumber);
         
+        for (int round = 1; round <= _hackathonRounds; round++)
+        {
+            _hackathon = _serviceProvider.GetRequiredService<IHackathon>();
+            StartHackathon(_hackathon, cancellationToken);
+        }
+
         return Task.CompletedTask;
     }
 
@@ -30,20 +48,14 @@ public class HackathonHostedService : IHostedService
         return Task.CompletedTask;
     }
 
-    private void MainTask(CancellationToken cancellationToken, int hackathonNumber = 1000)
+    private void StartHackathon(IHackathon hackathon, CancellationToken cancellationToken)
     {
-        Hackathon hackathon = (Hackathon)_hackathon;
-        double meanSatisfactionIndexForAllRounds = 0;
-        for (int i = 1; i <= hackathonNumber; i++)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            _hackathon.HoldEvent();
-            Console.WriteLine("Mean satisfaction index for {0}th round = {1}",
-                i.ToString(), hackathon.MeanSatisfactionIndex);
-            meanSatisfactionIndexForAllRounds += hackathon.MeanSatisfactionIndex;
-        }
+        _hackathonService.AddHackathon(hackathon);
 
-        Console.WriteLine(
-            "Mean satisfaction index for all rounds = " + meanSatisfactionIndexForAllRounds / hackathonNumber);
+        cancellationToken.ThrowIfCancellationRequested();
+        hackathon.HoldEvent();
+        _hackathonService.UpdateHackathon(hackathon);
+        _logger.LogInformation(
+           "Mean satisfaction index for all rounds = " + _hackathonService.GetMeanSatisfactionIndexForAllRounds());
     }
 }

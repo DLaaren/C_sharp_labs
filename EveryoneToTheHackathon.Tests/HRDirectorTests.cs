@@ -1,6 +1,5 @@
 using System.Reflection;
 using EveryoneToTheHackathon.Entities;
-using Xunit.Abstractions;
 
 namespace EveryoneToTheHackathon.Tests;
 

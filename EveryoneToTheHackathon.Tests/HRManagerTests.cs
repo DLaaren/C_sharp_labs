@@ -1,19 +1,10 @@
-using System.Reflection;
 using EveryoneToTheHackathon.Entities;
 using Moq;
-using Xunit.Abstractions;
 
 namespace EveryoneToTheHackathon.Tests;
 
 public class HRManagerTests
 {
-    private readonly ITestOutputHelper _testOutputHelper;
-
-    public HRManagerTests(ITestOutputHelper testOutputHelper)
-    {
-        _testOutputHelper = testOutputHelper;
-    }
-
     [Fact]
     public void CheckStrategyResultsWithDefinedData()
     {
@@ -34,8 +25,7 @@ public class HRManagerTests
             new Employee(4, EmployeeTitle.Junior, "Jane Jordan"),
             new Employee(5, EmployeeTitle.Junior, "Ken Kennedy")
         };
-
-
+        
         var teamLeadsWishlists = new List<Wishlist>(5);
         var juniorsWishlists = new List<Wishlist>(5);
         for (var i = 1; i <= teamLeads.Count; i++)
@@ -63,7 +53,8 @@ public class HRManagerTests
         List<Team> teams = (List<Team>)hrManager.BuildTeams(teamLeads, juniors, teamLeadsWishlists, juniorsWishlists);
         
         // Assert
-        Assert.Equal(teams, resultTeams);
+        Assert.Equal(teams.Select(t => t.TeamLead), resultTeams. Select(t => t.TeamLead));
+        Assert.Equal(teams.Select(t => t.Junior), resultTeams. Select(t => t.Junior));
     }
 
     [Fact]

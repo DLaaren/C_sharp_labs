@@ -6,11 +6,12 @@ namespace EveryoneToTheHackathon.Entities;
 [NotMapped]
 public class ProposeAndRejectAlgorithm : ITeamBuildingStrategy
 {
-    public IEnumerable<Team> BuildTeams(IEnumerable<Employee> teamLeads, IEnumerable<Employee> juniors, IEnumerable<Wishlist> teamLeadsWishlists,
-        IEnumerable<Wishlist> juniorsWishlists)
+    public IEnumerable<Team> BuildTeams(
+        IEnumerable<Employee> teamLeads, IEnumerable<Employee> juniors, 
+        IEnumerable<Wishlist> teamLeadsWishlists, IEnumerable<Wishlist> juniorsWishlists)
     {
-        var teamLeadsList = new List<Employee>(teamLeads);
-        var juniorsList = new List<Employee>(juniors);
+        var teamLeadsList = (List<Employee>)teamLeads;
+        var juniorsList = (List<Employee>)juniors;
         
         var teamLeadsWishlistsList = new List<Wishlist>(teamLeadsWishlists);
         var juniorsWishlistsList = new List<Wishlist>(juniorsWishlists);
@@ -40,8 +41,11 @@ public class ProposeAndRejectAlgorithm : ITeamBuildingStrategy
             
             // If the wanted junior is free, then make team with the teamlead and this junior
             if (freeJuniors[mostWantedJuniorId] == true)
-            {   
-                teams.Add(new Team(freeTeamLead, mostWantedJunior));
+            {
+                Team newTeam = new Team(freeTeamLead, mostWantedJunior);
+                teams.Add(newTeam);
+                ((List<Team>)freeTeamLead.Teams).Add(newTeam);
+                ((List<Team>)mostWantedJunior.Teams).Add(newTeam);
                 
                 freeTeamLeads[freeTeamLead.Id] = false;
                 freeJuniors[mostWantedJuniorId] = false;
@@ -69,7 +73,13 @@ public class ProposeAndRejectAlgorithm : ITeamBuildingStrategy
                 var removedTeam = teams.Find(t => t.Junior.Id == mostWantedJuniorId);
                 Debug.Assert(removedTeam != null, nameof(removedTeam) + " != null");
                 teams.Remove(removedTeam);
-                teams.Add(new Team(freeTeamLead, mostWantedJunior));
+
+                Team newTeam = new Team(freeTeamLead, mostWantedJunior);
+                teams.Add(newTeam);
+                //freeTeamLead.Team = newTeam;
+                //mostWantedJunior.Team = newTeam;
+                ((List<Team>)freeTeamLead.Teams).Add(newTeam);
+                ((List<Team>)mostWantedJunior.Teams).Add(newTeam);
                 
                 // And remove them from lists with free ones
                 freeTeamLeads[freeTeamLead.Id] = false;
@@ -80,7 +90,7 @@ public class ProposeAndRejectAlgorithm : ITeamBuildingStrategy
                 Debug.Assert(currentTeamLeadWishlistIds != null, nameof(currentTeamLeadWishlistIds) + " != null");
                 
                 var newCurrentTeamLeadWishlistIds = currentTeamLeadWishlistIds.Where(id => id != Array.IndexOf(currentTeamLeadWishlistIds, mostWantedJunior.Id)).ToArray();
-                var newCurrentTeamLeadWishlist = new Wishlist(currentTeamLead.Id, EmployeeTitle.TeamLead, newCurrentTeamLeadWishlistIds);
+                var newCurrentTeamLeadWishlist = new Wishlist(currentTeamLead.Id, "TeamLead", newCurrentTeamLeadWishlistIds);
                 teamLeadsWishlistsList[teamLeadsWishlistsList.FindIndex(w => w.EmployeeId == currentTeamLead.Id)] =
                     newCurrentTeamLeadWishlist;
                 
@@ -96,7 +106,7 @@ public class ProposeAndRejectAlgorithm : ITeamBuildingStrategy
             
             var newFreeTeamLeadWishlistIds = freeTeamLeadWishlistIds.Where((v, id) => id != Array.IndexOf(freeTeamLeadWishlistIds, mostWantedJuniorId)).ToArray();
 
-            var newFreeTeamLeadWishlist = new Wishlist(freeTeamLead.Id, EmployeeTitle.TeamLead, newFreeTeamLeadWishlistIds);
+            var newFreeTeamLeadWishlist = new Wishlist(freeTeamLead.Id, "TeamLead", newFreeTeamLeadWishlistIds);
             
             int wishlistIdx = teamLeadsWishlistsList.FindIndex(w => w.EmployeeId == freeTeamLead.Id);
             teamLeadsWishlistsList[wishlistIdx] = newFreeTeamLeadWishlist;

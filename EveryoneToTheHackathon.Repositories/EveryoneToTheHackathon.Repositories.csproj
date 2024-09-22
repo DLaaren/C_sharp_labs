@@ -7,7 +7,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\EveryoneToTheHackathon.Repositories\EveryoneToTheHackathon.Repositories.csproj" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0-rc.1.24451.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\EveryoneToTheHackathon.Entities\EveryoneToTheHackathon.Entities.csproj" />
     </ItemGroup>
 
 </Project>

@@ -4,20 +4,23 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EveryoneToTheHackathon.Entities;
 
-[PrimaryKey("EmployeeId", "EmployeeTitle")]
+[PrimaryKey("EmployeeId", "EmployeeTitle", "HackathonId")]
 public class Wishlist
 { 
-    public int EmployeeId { get; init; }
-    public EmployeeTitle EmployeeTitle { get; init; }
+    public int EmployeeId { get; set; }
+    public string EmployeeTitle { get; set; }
     
-    public Employee? Employee { get; init; }
+    public Employee? Employee { get; set; }
     
     [Required]
-    public int[] DesiredEmployees { get; init; }
+    public int[] DesiredEmployees { get; set; }
+    
+    public int HackathonId { get; set; } // внешний ключ
+    public Hackathon? Hackathon { get; set; } // навигационное свойство
     
     public Wishlist() {}
 
-    public Wishlist(int employeeId, EmployeeTitle title, int[] desiredEmployees)
+    public Wishlist(int employeeId, string title, int[] desiredEmployees)
     {
         EmployeeId = employeeId;
         EmployeeTitle = title;

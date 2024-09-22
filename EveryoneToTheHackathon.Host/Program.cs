@@ -1,7 +1,8 @@
 using System.Text.Json;
-using EveryoneToTheHackathon;
 using EveryoneToTheHackathon.Entities;
 using EveryoneToTheHackathon.Host;
+using EveryoneToTheHackathon.Repositories;
+using EveryoneToTheHackathon.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +12,8 @@ using Microsoft.Extensions.Logging;
 var builder = Host.CreateApplicationBuilder(args);
 builder.Configuration.AddJsonFile("appsettings.json", true, true);
 
+Int32.TryParse(builder.Configuration["HackathonRounds"], out int totalRounds);
+totalRounds = totalRounds == 0 ? 1000 : totalRounds;
 List<Employee> teamLeads = (List<Employee>)CsvParser.ParseCsvFileWithEmployees(
     builder.Configuration["Resources:TeamLeadsList"] ?? "Resources/Teamleads20.csv", EmployeeTitle.TeamLead);
 List<Employee> juniors = (List<Employee>)CsvParser.ParseCsvFileWithEmployees(
@@ -26,30 +29,42 @@ string connString =
         builder.Configuration["Database:Password"] ?? throw new JsonException()
     );
 
-builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connString));
-builder.Services.AddScoped<EmployeesSeedData>(_ => new EmployeesSeedData(teamLeads, juniors));
+builder.Services.AddDbContext<AppDbContext>(options =>
+{
+    options.UseNpgsql(connString);
+    options.EnableDetailedErrors();
+});
+//builder.Services.AddScoped<EmployeesSeedData>(_ => new EmployeesSeedData(teamLeads, juniors));
 
 builder.Services.AddTransient<IHackathon, Hackathon>(
     h => new Hackathon(
-        CsvParser.ParseCsvFileWithEmployees(builder.Configuration["Resources:TeamLeadsList"] ?? "Resources/Teamleads20.csv", EmployeeTitle.TeamLead),
-        20,
-        CsvParser.ParseCsvFileWithEmployees(builder.Configuration["Resources:JuniorsList"] ?? "Resources/Juniors20.csv", EmployeeTitle.Junior),
-        20,
+        teamLeads,
+        juniors,
         h.GetRequiredService<HRManager>(),
         h.GetRequiredService<HRDirector>()
     )
 ); 
-builder.Services.AddScoped<ITeamBuildingStrategy, ProposeAndRejectAlgorithm>();
-builder.Services.AddScoped<HRManager>();
-builder.Services.AddScoped<HRDirector>();
+builder.Services.AddTransient<ITeamBuildingStrategy, ProposeAndRejectAlgorithm>();
+builder.Services.AddTransient<HRManager>();
+builder.Services.AddTransient<HRDirector>();
+
+builder.Services.AddTransient<IHackathonService, HackathonService>();
+builder.Services.AddTransient<IEmployeeService, EmployeeService>();
+builder.Services.AddTransient<IWishlistService, WishlistService>();
+builder.Services.AddTransient<ITeamService, TeamService>();
 
 builder.Services.AddHostedService<DbHostedService>();
 
-builder.Services.AddHostedService<HackathonHostedService>(h => 
+builder.Services.AddHostedService<HackathonHostedService>(h =>
     new HackathonHostedService(
-        h.GetRequiredService<ILogger<HackathonHostedService>>(), 
-        h.GetRequiredService<IHackathon>(), 
-        1));
+        h,
+        h.GetRequiredService<ILogger<HackathonHostedService>>(),
+        totalRounds,
+        h.GetRequiredService<IHackathonService>(),
+        h.GetRequiredService<IEmployeeService>(),
+        h.GetRequiredService<IWishlistService>(),
+        h.GetRequiredService<ITeamService>()));
 
 var host = builder.Build();
+
 await host.RunAsync();

@@ -24,7 +24,6 @@ public class WishlistTests
             new Employee(4, EmployeeTitle.Junior, "Jane Jordan"),
             new Employee(5, EmployeeTitle.Junior, "Ken Kennedy")
         };
-
         
         // Act
         var teamLeadsWishlists = teamLeads.Select(teamlead => teamlead.MakeWishlist(juniors)).ToList();

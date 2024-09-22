@@ -7,24 +7,23 @@ namespace EveryoneToTheHackathon.Entities;
 [PrimaryKey("Id", "Title")]
 public class Employee
 {
-    public int Id { get; init; }
-    public EmployeeTitle Title { get; init; }
+    public int Id { get; set; }
+    public string Title { get; set; }
     
     [Required]
     [MaxLength(50)]
-    public string Name { get; init; }
+    public string Name { get; set; }
     
-    public int? HackathonId { get; set; } // внешний ключ
-    public Hackathon? Hackathon { get; set; } // навигационное свойство
+    //public int? HackathonId { get; set; }
+    public IEnumerable<Hackathon>? Hackathons { get; set; } = new List<Hackathon>();
     
-    public int? TeamId { get; set; }
-    public Team? Team { get; set; }
-
+    //public int? TeamId { get; set; }
+    public IEnumerable<Team>? Teams { get; set; } = new List<Team>();
     public Wishlist? Wishlist { get; set; }
     
     public Employee() {}
 
-    public Employee(int id, EmployeeTitle title, string name)
+    public Employee(int id, string title, string name)
     {
         Id = id;
         Title = title;

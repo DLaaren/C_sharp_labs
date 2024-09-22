@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
+using EveryoneToTheHackathon.Entities;
 
 namespace EveryoneToTheHackathon.Entities;
 

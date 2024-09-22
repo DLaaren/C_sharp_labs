@@ -1,17 +1,9 @@
 using EveryoneToTheHackathon.Entities;
-using Xunit.Abstractions;
 
 namespace EveryoneToTheHackathon.Tests;
 
 public class HackathonTests
 {
-    private readonly ITestOutputHelper _testOutputHelper;
-
-    public HackathonTests(ITestOutputHelper testOutputHelper)
-    {
-        _testOutputHelper = testOutputHelper;
-    }
-
     [Fact]
     public void CheckHackathonResultWithDefinedData()
     {
@@ -33,7 +25,6 @@ public class HackathonTests
             new Employee(5, EmployeeTitle.Junior, "Ken Kennedy")
         };
 
-
         var teamLeadsWishlists = new List<Wishlist>(5);
         var juniorsWishlists = new List<Wishlist>(5);
         for (var i = 1; i <= teamLeads.Count; i++)
@@ -48,9 +39,10 @@ public class HackathonTests
         }
 
         Hackathon hackathon = new Hackathon(
-            teamLeads, 5, 
-            juniors, 5,
-            new HRManager(new ProposeAndRejectAlgorithm()), new HRDirector()
+            teamLeads, 
+            juniors,
+            new HRManager(new ProposeAndRejectAlgorithm()),
+            new HRDirector()
             );
         
         // Act = perform test

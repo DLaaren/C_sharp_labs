@@ -6,17 +6,18 @@ namespace EveryoneToTheHackathon.Entities;
 public class Team
 {
     [Key]
-    public int Id { get; init; }
+    public int Id { get; set; }
 
-    [NotMapped]
-    public Employee TeamLead;
-    [NotMapped]
-    public Employee Junior;
-    
-    public int HackathonId { get; set; } // внешний ключ
+    [NotMapped] 
+    public Employee TeamLead { get; set; }
+
+    [NotMapped] 
+    public Employee Junior { get; set; }
+
+    public int? HackathonId { get; set; } // внешний ключ
     public Hackathon? Hackathon { get; set; } // навигационное свойство
     
-    public List<Employee> Employees { get; init; }
+    public List<Employee> Employees { get; set; }
 
     public Team() {}
     

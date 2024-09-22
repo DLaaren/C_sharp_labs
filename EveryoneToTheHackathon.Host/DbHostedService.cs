@@ -1,4 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
+using EveryoneToTheHackathon.Repositories;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -8,25 +8,17 @@ public class DbHostedService : IHostedService
 {
     private readonly ILogger<DbHostedService> _logger;
     private readonly AppDbContext _dbContext;
-    private readonly EmployeesSeedData? _employeesSeedData;
 
     public DbHostedService(ILogger<DbHostedService> logger, AppDbContext dbContext)
     {
         _logger = logger;
         _dbContext = dbContext;
     }
-    
-    public DbHostedService(ILogger<DbHostedService> logger, AppDbContext dbContext, EmployeesSeedData employeesSeedData)
-    {
-        _logger = logger;
-        _dbContext = dbContext;
-        _employeesSeedData = employeesSeedData;
-    }
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         _logger.LogInformation("Starting DbHostedService");
-        await (_employeesSeedData != null ? PreloadData(_dbContext) : Task.CompletedTask);
+        await PreloadData(_dbContext);
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
@@ -37,8 +29,11 @@ public class DbHostedService : IHostedService
     private async Task PreloadData(AppDbContext dbContext)
     {
         _logger.LogInformation("Preloading data");
+        dbContext.Hackathons.RemoveRange(dbContext.Hackathons);
         dbContext.Employees.RemoveRange(dbContext.Employees);
-        dbContext.Employees.AddRange(_employeesSeedData!.Employees);
+        dbContext.Wishlists.RemoveRange(dbContext.Wishlists);
+        dbContext.Teams.RemoveRange(dbContext.Teams);
+        
         await dbContext.SaveChangesAsync();
     }
 }
