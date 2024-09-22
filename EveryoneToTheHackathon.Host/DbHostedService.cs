@@ -6,7 +6,7 @@ namespace EveryoneToTheHackathon.Host;
 
 public class DbHostedService : IHostedService
 {
-    private readonly ILogger _logger;
+    private readonly ILogger<DbHostedService> _logger;
     private readonly AppDbContext _dbContext;
     private readonly EmployeesSeedData? _employeesSeedData;
 
@@ -37,6 +37,7 @@ public class DbHostedService : IHostedService
     private async Task PreloadData(AppDbContext dbContext)
     {
         _logger.LogInformation("Preloading data");
+        dbContext.Employees.RemoveRange(dbContext.Employees);
         dbContext.Employees.AddRange(_employeesSeedData!.Employees);
         await dbContext.SaveChangesAsync();
     }

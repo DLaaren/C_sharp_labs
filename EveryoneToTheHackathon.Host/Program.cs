@@ -29,7 +29,16 @@ string connString =
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connString));
 builder.Services.AddScoped<EmployeesSeedData>(_ => new EmployeesSeedData(teamLeads, juniors));
 
-builder.Services.AddScoped<IHackathon, Hackathon>(); 
+builder.Services.AddTransient<IHackathon, Hackathon>(
+    h => new Hackathon(
+        CsvParser.ParseCsvFileWithEmployees(builder.Configuration["Resources:TeamLeadsList"] ?? "Resources/Teamleads20.csv", EmployeeTitle.TeamLead),
+        20,
+        CsvParser.ParseCsvFileWithEmployees(builder.Configuration["Resources:JuniorsList"] ?? "Resources/Juniors20.csv", EmployeeTitle.Junior),
+        20,
+        h.GetRequiredService<HRManager>(),
+        h.GetRequiredService<HRDirector>()
+    )
+); 
 builder.Services.AddScoped<ITeamBuildingStrategy, ProposeAndRejectAlgorithm>();
 builder.Services.AddScoped<HRManager>();
 builder.Services.AddScoped<HRDirector>();

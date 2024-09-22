@@ -6,7 +6,7 @@ namespace EveryoneToTheHackathon.Host;
 
 public class HackathonHostedService : IHostedService
 {
-    private readonly ILogger _logger;
+    private readonly ILogger<HackathonHostedService> _logger;
     private readonly IHackathon _hackathon;
     private readonly int _hackathonNumber;
     
