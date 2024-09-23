@@ -44,8 +44,6 @@ public class ProposeAndRejectAlgorithm : ITeamBuildingStrategy
             {
                 Team newTeam = new Team(freeTeamLead, mostWantedJunior);
                 teams.Add(newTeam);
-                ((List<Team>)freeTeamLead.Teams).Add(newTeam);
-                ((List<Team>)mostWantedJunior.Teams).Add(newTeam);
                 
                 freeTeamLeads[freeTeamLead.Id] = false;
                 freeJuniors[mostWantedJuniorId] = false;
@@ -76,10 +74,6 @@ public class ProposeAndRejectAlgorithm : ITeamBuildingStrategy
 
                 Team newTeam = new Team(freeTeamLead, mostWantedJunior);
                 teams.Add(newTeam);
-                //freeTeamLead.Team = newTeam;
-                //mostWantedJunior.Team = newTeam;
-                ((List<Team>)freeTeamLead.Teams).Add(newTeam);
-                ((List<Team>)mostWantedJunior.Teams).Add(newTeam);
                 
                 // And remove them from lists with free ones
                 freeTeamLeads[freeTeamLead.Id] = false;

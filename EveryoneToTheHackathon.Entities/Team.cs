@@ -5,20 +5,25 @@ namespace EveryoneToTheHackathon.Entities;
 
 public class Team
 {
+    /* Public properties for database */
     [Key]
     public int Id { get; set; }
+    
+    /* Public properties for database */
 
+    /* Navigation properties */
+    public int? HackathonId { get; set; }
+    public Hackathon? Hackathon { get; set; }
+    public List<Employee>? Employees { get; set; }
+    /* Navigation properties */
+    
+    /* Private properties for inner logic */
     [NotMapped] 
     public Employee TeamLead { get; set; }
-
     [NotMapped] 
     public Employee Junior { get; set; }
-
-    public int? HackathonId { get; set; } // внешний ключ
-    public Hackathon? Hackathon { get; set; } // навигационное свойство
+    /* Private properties for inner logic */
     
-    public List<Employee> Employees { get; set; }
-
     public Team() {}
     
     public Team(Employee teamLead, Employee junior)

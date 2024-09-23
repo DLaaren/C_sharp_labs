@@ -6,14 +6,19 @@ namespace EveryoneToTheHackathon.Entities;
 
 public class Hackathon : IHackathon
 {
+    /* Public properties for database */
     [Key]
     public int Id { get; set; }
     public double MeanSatisfactionIndex { get; set; }
+    /* Public properties for database */
 
-    public List<Team>? Teams { get; set; }
-    public List<Employee>? Employees { get; set; }
-    public List<Wishlist>? Wishlists { get; set; }
+    /* Navigation properties */
+    public IEnumerable<Employee>? Employees { get; set; }
+    public IEnumerable<Wishlist>? Wishlists { get; set; }
+    public IEnumerable<Team>? Teams { get; set; }
+    /* Navigation properties */
     
+    /* Private properties for inner logic */
     private readonly List<Employee> _teamLeads;
     private readonly List<Employee> _juniors;
     
@@ -22,6 +27,7 @@ public class Hackathon : IHackathon
 
     private List<Wishlist>? _juniorsWishlists;
     private List<Wishlist>? _teamLeadsWishlists;
+    /* Private properties for inner logic */
 
     public Hackathon() {}
 
@@ -36,8 +42,8 @@ public class Hackathon : IHackathon
         _hrDirector = hrDirector;
 
         Employees = new List<Employee>();
-        Employees.AddRange(teamLeads);
-        Employees.AddRange(juniors);
+        ((List<Employee>)Employees).AddRange(teamLeads);
+        ((List<Employee>)Employees).AddRange(juniors);
     }
 
     public void HoldEvent()
@@ -47,19 +53,16 @@ public class Hackathon : IHackathon
 
         Wishlists = _teamLeadsWishlists.Concat(_juniorsWishlists).ToList();
         
-        var teams1 = (List<Team>)_hrManager.BuildTeams(_teamLeads, _juniors, _teamLeadsWishlists, _juniorsWishlists);
-        double idx1 = _hrDirector.CalculateMeanSatisfactionIndex(_teamLeadsWishlists, _juniorsWishlists, teams1);
+        Teams = (List<Team>)_hrManager.BuildTeams(_teamLeads, _juniors, _teamLeadsWishlists, _juniorsWishlists);
+        MeanSatisfactionIndex = _hrDirector.CalculateMeanSatisfactionIndex(_teamLeadsWishlists, _juniorsWishlists, Teams);
         
-        var teams2 = (List<Team>)_hrManager.BuildTeams(_juniors, _teamLeads, _juniorsWishlists, _teamLeadsWishlists);
-        double idx2 = _hrDirector.CalculateMeanSatisfactionIndex(_juniorsWishlists, _teamLeadsWishlists, teams2);
-        
-        Teams = idx1 > idx2 ? teams1 : teams2;
-        Teams.ForEach(t =>
+        ((List<Team>)Teams).ForEach(t =>
         {
             t.Hackathon = this;
             t.HackathonId = Id;
         });
-        MeanSatisfactionIndex = idx1 > idx2 ? idx1 : idx2;
+        
+        ((List<Employee>)Employees).ForEach(e => ((List<Team>)e.Teams).AddRange( ((List<Team>)Teams).FindAll(t => t.TeamLead.Equals(e) || t.Junior.Equals(e))) );
     }
     
     public void HoldEvent(IEnumerable<Wishlist> teamLeadsWishlists, IEnumerable<Wishlist> juniorsWishlists)
@@ -69,18 +72,13 @@ public class Hackathon : IHackathon
         
         Wishlists = _teamLeadsWishlists.Concat(_juniorsWishlists).ToList();
 
-        var teams1 = (List<Team>)_hrManager.BuildTeams(_teamLeads, _juniors, _teamLeadsWishlists, _juniorsWishlists);
-        double idx1 = _hrDirector.CalculateMeanSatisfactionIndex(_teamLeadsWishlists, _juniorsWishlists, teams1);
+        Teams = (List<Team>)_hrManager.BuildTeams(_teamLeads, _juniors, _teamLeadsWishlists, _juniorsWishlists);
+        MeanSatisfactionIndex = _hrDirector.CalculateMeanSatisfactionIndex(_teamLeadsWishlists, _juniorsWishlists, Teams);
         
-        var teams2 = (List<Team>)_hrManager.BuildTeams(_juniors, _teamLeads, _juniorsWishlists, _teamLeadsWishlists);
-        double idx2 = _hrDirector.CalculateMeanSatisfactionIndex(_juniorsWishlists, _teamLeadsWishlists, teams2);
-        
-        Teams = idx1 > idx2 ? teams1 : teams2;
-        Teams.ForEach(t =>
+        ((List<Team>)Teams).ForEach(t =>
         {
             t.Hackathon = this;
             t.HackathonId = Id;
         });
-        MeanSatisfactionIndex = idx1 > idx2 ? idx1 : idx2;
     }
 }
