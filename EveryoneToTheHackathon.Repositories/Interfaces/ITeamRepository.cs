@@ -1,8 +1,8 @@
 using EveryoneToTheHackathon.Entities;
 
-namespace EveryoneToTheHackathon.Services;
+namespace EveryoneToTheHackathon.Repositories;
 
-public interface ITeamService
+public interface ITeamRepository
 {
     public Team? GetTeamById(int teamId);
     public IEnumerable<Team> GetTeams();

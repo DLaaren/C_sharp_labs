@@ -2,7 +2,6 @@ using System.Text.Json;
 using EveryoneToTheHackathon.Entities;
 using EveryoneToTheHackathon.Host;
 using EveryoneToTheHackathon.Repositories;
-using EveryoneToTheHackathon.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,7 +33,6 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connString);
     options.EnableDetailedErrors();
 });
-//builder.Services.AddScoped<EmployeesSeedData>(_ => new EmployeesSeedData(teamLeads, juniors));
 
 builder.Services.AddTransient<IHackathon, Hackathon>(
     h => new Hackathon(
@@ -48,10 +46,10 @@ builder.Services.AddTransient<ITeamBuildingStrategy, ProposeAndRejectAlgorithm>(
 builder.Services.AddTransient<HRManager>();
 builder.Services.AddTransient<HRDirector>();
 
-builder.Services.AddTransient<IHackathonService, HackathonService>();
-builder.Services.AddTransient<IEmployeeService, EmployeeService>();
-builder.Services.AddTransient<IWishlistService, WishlistService>();
-builder.Services.AddTransient<ITeamService, TeamService>();
+builder.Services.AddTransient<IHackathonRepository, HackathonRepository>();
+builder.Services.AddTransient<IEmployeeRepository, EmployeeRepository>();
+builder.Services.AddTransient<IWishlistRepository, WishlistRepository>();
+builder.Services.AddTransient<ITeamRepository, TeamRepository>();
 
 builder.Services.AddHostedService<DbHostedService>();
 
@@ -60,10 +58,10 @@ builder.Services.AddHostedService<HackathonHostedService>(h =>
         h,
         h.GetRequiredService<ILogger<HackathonHostedService>>(),
         totalRounds,
-        h.GetRequiredService<IHackathonService>(),
-        h.GetRequiredService<IEmployeeService>(),
-        h.GetRequiredService<IWishlistService>(),
-        h.GetRequiredService<ITeamService>()));
+        h.GetRequiredService<IHackathonRepository>(),
+        h.GetRequiredService<IEmployeeRepository>(),
+        h.GetRequiredService<IWishlistRepository>(),
+        h.GetRequiredService<ITeamRepository>()));
 
 var host = builder.Build();
 

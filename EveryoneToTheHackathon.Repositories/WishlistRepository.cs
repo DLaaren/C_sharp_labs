@@ -2,9 +2,9 @@ using EveryoneToTheHackathon.Entities;
 using EveryoneToTheHackathon.Repositories;
 using Microsoft.EntityFrameworkCore;
 
-namespace EveryoneToTheHackathon.Services;
+namespace EveryoneToTheHackathon.Repositories;
 
-public class WishlistService(AppDbContext dbContext) : IWishlistService
+public class WishlistRepository(AppDbContext dbContext) : IWishlistRepository
 {
     private readonly AppDbContext _dbContext = dbContext;
 

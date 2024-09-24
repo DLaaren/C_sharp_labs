@@ -1,8 +1,8 @@
 using EveryoneToTheHackathon.Entities;
 
-namespace EveryoneToTheHackathon.Services;
+namespace EveryoneToTheHackathon.Repositories;
 
-public interface IHackathonService
+public interface IHackathonRepository
 {
     public IHackathon? GetHackathonById(int hackathonId);
     public IEnumerable<IHackathon> GetHackathons();

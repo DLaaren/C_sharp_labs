@@ -1,5 +1,5 @@
 using EveryoneToTheHackathon.Entities;
-using EveryoneToTheHackathon.Services;
+using EveryoneToTheHackathon.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -13,21 +13,21 @@ public class HackathonHostedService : IHostedService
     private IHackathon? _hackathon;
     private readonly int _hackathonRounds;
     
-    private readonly IHackathonService _hackathonService;
-    private readonly IEmployeeService _employeeService;
-    private readonly IWishlistService _wishlistService;
-    private readonly ITeamService _teamService;
+    private readonly IHackathonRepository _hackathonRepository;
+    private readonly IEmployeeRepository _employeeRepository;
+    private readonly IWishlistRepository _wishlistRepository;
+    private readonly ITeamRepository _teamRepository;
     
     public HackathonHostedService(IServiceProvider serviceProvider, ILogger<HackathonHostedService> logger, int hackathonRounds,
-        IHackathonService hackathonService, IEmployeeService employeeService, IWishlistService wishlistService, ITeamService teamService)
+        IHackathonRepository hackathonRepository, IEmployeeRepository employeeRepository, IWishlistRepository wishlistRepository, ITeamRepository teamRepository)
     {
         _serviceProvider = serviceProvider;
         _logger = logger;
         _hackathonRounds = hackathonRounds;
-        _hackathonService = hackathonService;
-        _employeeService = employeeService;
-        _wishlistService = wishlistService;
-        _teamService = teamService;
+        _hackathonRepository = hackathonRepository;
+        _employeeRepository = employeeRepository;
+        _wishlistRepository = wishlistRepository;
+        _teamRepository = teamRepository;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -50,12 +50,12 @@ public class HackathonHostedService : IHostedService
 
     private void StartHackathon(IHackathon hackathon, CancellationToken cancellationToken)
     {
-        _hackathonService.AddHackathon(hackathon);
+        _hackathonRepository.AddHackathon(hackathon);
 
         cancellationToken.ThrowIfCancellationRequested();
         hackathon.HoldEvent();
-        _hackathonService.UpdateHackathon(hackathon);
+        _hackathonRepository.UpdateHackathon(hackathon);
         _logger.LogInformation(
-           "Mean satisfaction index for all rounds = " + _hackathonService.GetMeanSatisfactionIndexForAllRounds());
+           "Mean satisfaction index for all rounds = " + _hackathonRepository.GetMeanSatisfactionIndexForAllRounds());
     }
 }

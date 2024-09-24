@@ -22,7 +22,7 @@ public class Employee
     /* Navigation properties */
     
     public Employee() {}
-
+    
     public Employee(int id, string title, string name)
     {
         Id = id;

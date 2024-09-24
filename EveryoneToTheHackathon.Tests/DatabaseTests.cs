@@ -1,6 +1,5 @@
 using EveryoneToTheHackathon.Entities;
 using EveryoneToTheHackathon.Repositories;
-using EveryoneToTheHackathon.Services;
 using Microsoft.EntityFrameworkCore;
 using Xunit.Abstractions;
 
@@ -61,7 +60,7 @@ public class DatabaseTests
         };
         
         var dbContext = GetInMemoryDbContext();
-        var hackathonService = new HackathonService(dbContext);
+        var hackathonService = new HackathonRepository(dbContext);
         var hackathon = new Hackathon(
             teamLeads, 
             juniors, 
@@ -101,7 +100,7 @@ public class DatabaseTests
     {
         // Arrange
         var dbContext = GetInMemoryDbContext();
-        var hackathonService = new HackathonService(dbContext);
+        var hackathonService = new HackathonRepository(dbContext);
         var hackathon1 = new Hackathon
         {
             Id = 2,
