@@ -1,8 +1,8 @@
 using EveryoneToTheHackathon.Entities;
 
-namespace EveryoneToTheHackathon.Services;
+namespace EveryoneToTheHackathon.Repositories;
 
-public interface IWishlistService
+public interface IWishlistRepository
 {
     public Wishlist? GetWishlistById(int wishlistId);
     public IEnumerable<Wishlist> GetWishlists();

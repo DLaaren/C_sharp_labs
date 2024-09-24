@@ -1,10 +1,8 @@
 using EveryoneToTheHackathon.Entities;
-using EveryoneToTheHackathon.Repositories;
-using Microsoft.EntityFrameworkCore;
 
-namespace EveryoneToTheHackathon.Services;
+namespace EveryoneToTheHackathon.Repositories;
 
-public class EmployeeService(AppDbContext dbContext) : IEmployeeService
+public class EmployeeRepository(AppDbContext dbContext) : IEmployeeRepository
 {
     private readonly AppDbContext _dbContext = dbContext;
 

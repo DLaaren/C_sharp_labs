@@ -1,0 +1,250 @@
+﻿networks:
+  database:
+    driver: bridge
+  hackathon:
+    driver: bridge
+
+
+services:
+      
+  database:
+    image: "postgres:16-alpine"
+    container_name: postgresql
+    environment:
+      # новопточники сказали как-то по другому передавать пароль
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: Hackathon
+      PGDATA: /var/lib/postgresql/data/pgdata
+
+    ports:
+      - "5432:5432"
+      
+    networks:
+      - database
+      - hackathon
+
+  hr_director:
+    image: "hackathon/hr_director:latest"
+    container_name: hr_director
+    
+    build:
+      context: .
+      dockerfile: EveryoneToTheHackathon.HRDirectorService/Dockerfile
+      
+    environment:
+      - employees_number=10
+      
+    depends_on:
+      - database
+      - 
+    networks:
+      - database
+      - hackathon
+        
+  hr_manager:
+    image: "hackathon/hr_manager:latest"
+    container_name: hr_manager
+    
+    build:
+      context: .
+      dockerfile: EveryoneToTheHackathon.HRManagerService/Dockerfile
+    
+    environment:
+      - employees_number=10
+      
+    depends_on:
+      - hr_director
+      - 
+    networks:
+      - hackathon
+        
+  teamlead-1:
+    image: "hackathon/employee:latest"
+    container_name: employee
+    
+    build:
+      context: .
+      dockerfile: EveryoneToTheHackathon.EmployeeService/Dockerfile
+      
+    environment:
+      - id=1
+      - title="TeamLead"
+      - name=
+    
+    depends_on:
+      - hr_manager
+      - 
+    networks:
+      - hackathon
+        
+  teamlead-2:
+    image: "hackathon/employee:latest"
+    container_name: employee
+
+    build:
+      context: .
+      dockerfile: EveryoneToTheHackathon.EmployeeService/Dockerfile
+
+    environment:
+      - id=2
+      - title="TeamLead"
+      - name=
+
+    depends_on:
+      - hr_manager
+      -
+    networks:
+      - hackathon
+  
+  teamlead-3:
+    image: "hackathon/employee:latest"
+    container_name: employee
+
+    build:
+      context: .
+      dockerfile: EveryoneToTheHackathon.EmployeeService/Dockerfile
+
+    environment:
+      - id=3
+      - title="TeamLead"
+      - name=
+
+    depends_on:
+      - hr_manager
+      -
+    networks:
+      - hackathon
+        
+  teamlead-4:
+    image: "hackathon/employee:latest"
+    container_name: employee
+
+    build:
+      context: .
+      dockerfile: EveryoneToTheHackathon.EmployeeService/Dockerfile
+
+    environment:
+      - id=4
+      - title="TeamLead"
+      - name=
+
+    depends_on:
+      - hr_manager
+      -
+    networks:
+      - hackathon
+  
+  teamlead-5:
+    image: "hackathon/employee:latest"
+    container_name: employee
+
+    build:
+      context: .
+      dockerfile: EveryoneToTheHackathon.EmployeeService/Dockerfile
+
+    environment:
+      - id=5
+      - title="TeamLead"
+      - name=
+
+    depends_on:
+      - hr_manager
+      -
+    networks:
+      - hackathon
+        
+  junior-1:
+    image: "hackathon/employee:latest"
+    container_name: employee
+
+    build:
+      context: .
+      dockerfile: EveryoneToTheHackathon.EmployeeService/Dockerfile
+
+    environment:
+      - id=1
+      - title="Junior"
+      - name=
+
+    depends_on:
+      - hr_manager
+      -
+    networks:
+      - hackathon
+
+  junior-2:
+    image: "hackathon/employee:latest"
+    container_name: employee
+
+    build:
+      context: .
+      dockerfile: EveryoneToTheHackathon.EmployeeService/Dockerfile
+
+    environment:
+      - id=2
+      - title="Junior"
+      - name=
+
+    depends_on:
+      - hr_manager
+      -
+    networks:
+      - hackathon
+
+  junior-3:
+    image: "hackathon/employee:latest"
+    container_name: employee
+
+    build:
+      context: .
+      dockerfile: EveryoneToTheHackathon.EmployeeService/Dockerfile
+
+    environment:
+      - id=3
+      - title="Junior"
+      - name=
+
+    depends_on:
+      - hr_manager
+      -
+    networks:
+      - hackathon
+
+  junior-4:
+    image: "hackathon/employee:latest"
+    container_name: employee
+
+    build:
+      context: .
+      dockerfile: EveryoneToTheHackathon.EmployeeService/Dockerfile
+
+    environment:
+      - id=4
+      - title="Junior"
+      - name=
+
+    depends_on:
+      - hr_manager
+      -
+    networks:
+      - hackathon
+
+  junior-5:
+    image: "hackathon/employee:latest"
+    container_name: employee
+
+    build:
+      context: .
+      dockerfile: EveryoneToTheHackathon.EmployeeService/Dockerfile
+
+    environment:
+      - id=5
+      - title="Junior"
+      - name=
+
+    depends_on:
+      - hr_manager
+      -
+    networks:
+      - hackathon

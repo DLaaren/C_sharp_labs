@@ -1,8 +1,8 @@
 using EveryoneToTheHackathon.Entities;
 
-namespace EveryoneToTheHackathon.Services;
+namespace EveryoneToTheHackathon.Repositories;
 
-public interface IEmployeeService
+public interface IEmployeeRepository
 {
     public Employee? GetEmployeeById(int employeeId);
     public IEnumerable<Employee> GetEmployees();

@@ -7,11 +7,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\EveryoneToTheHackathon.Entities\EveryoneToTheHackathon.Entities.csproj" />
+      <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0-rc.1.24451.1" />
+      <ProjectReference Include="..\EveryoneToTheHackathon.Dtos\EveryoneToTheHackathon.Dtos.csproj" />
+      <ProjectReference Include="..\EveryoneToTheHackathon.Entities\EveryoneToTheHackathon.Entities.csproj" />
     </ItemGroup>
 
 </Project>
