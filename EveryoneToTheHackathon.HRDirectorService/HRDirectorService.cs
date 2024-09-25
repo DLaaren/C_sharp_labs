@@ -12,9 +12,9 @@ public class HRDirectorService : BackgroundService
     public List<Employee>? Employees { get; set; }
     public List<Wishlist>? Wishlists { get; set; }
     public List<Team>? Teams { get; set; }
-    private HackathonRepository _hackathonRepository;
+    private IHackathonRepository _hackathonRepository;
 
-    public HRDirectorService(ILogger<HRDirectorService> logger, HttpClient httpClient, HRDirector hrDirector, int employeesNumber, HackathonRepository hackathonRepository)
+    public HRDirectorService(ILogger<HRDirectorService> logger, HttpClient httpClient, HRDirector hrDirector, int employeesNumber, IHackathonRepository hackathonRepository)
     {
         _logger = logger;
         _httpClient = httpClient;

@@ -9,26 +9,24 @@ public class HRManagerService : BackgroundService
 {
     private readonly ILogger<HRManagerService> _logger;
     private readonly HttpClient _httpClient;
-    private readonly string _hrDirectorUrl;
     private readonly HRManager _hrManager;
-    public int EmployeesNumber { get; init; }
+    //public int EmployeesNumber { get; init; }
     public IEnumerable<Employee>? Employees { get; set; }
     public IEnumerable<Wishlist>? Wishlists { get; set; }
 
-    public HRManagerService(ILogger<HRManagerService> logger, HttpClient httpClient, string hrDirectorUrl, HRManager hrManager, int employeesNumber)
+    public HRManagerService(ILogger<HRManagerService> logger, HttpClient httpClient, HRManager hrManager)//, int employeesNumber)
     {
         _logger = logger;
         _httpClient = httpClient;
-        _hrDirectorUrl = hrDirectorUrl;
         _hrManager = hrManager;
-        EmployeesNumber = employeesNumber;
+        //EmployeesNumber = employeesNumber;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation("HRManager waiting for employees;");
 
-        if (Employees == null)
+        while (Employees == null)
             await Task.Delay(1000, stoppingToken);
             
         await SendEmployeesAsync(Employees!, stoppingToken);
@@ -36,7 +34,7 @@ public class HRManagerService : BackgroundService
         
         
         _logger.LogInformation("HRManager waiting for wishlists;");
-        if (Wishlists == null)
+        while (Wishlists == null)
             await Task.Delay(1000, stoppingToken);
         
         await SendWishlistsAsync(Wishlists!, stoppingToken);
@@ -61,7 +59,7 @@ public class HRManagerService : BackgroundService
         var employeeDtos = employees.Select(e => new EmployeeDto(e.Id, e.Title, e.Name));
         
         var content = new StringContent(JsonSerializer.Serialize(employeeDtos), Encoding.UTF8, "application/json");
-        var response = await _httpClient.PostAsync(_hrDirectorUrl, content, stoppingToken);
+        var response = await _httpClient.PostAsync(_httpClient.BaseAddress + "api/hr_director/employees", content, stoppingToken);
         response.EnsureSuccessStatusCode();
         await Task.CompletedTask;
     }
@@ -71,7 +69,7 @@ public class HRManagerService : BackgroundService
         var wishlistDtos = wishlists.Select(w => new WishlistDto(w.EmployeeId, w.EmployeeTitle, w.DesiredEmployees));
         
         var content = new StringContent(JsonSerializer.Serialize(wishlistDtos), Encoding.UTF8, "application/json");
-        var response = await _httpClient.PostAsync(_hrDirectorUrl, content, stoppingToken);
+        var response = await _httpClient.PostAsync(_httpClient.BaseAddress + "api/hr_director/wishlists", content, stoppingToken);
         response.EnsureSuccessStatusCode();
         await Task.CompletedTask;
     }
@@ -83,7 +81,7 @@ public class HRManagerService : BackgroundService
             new EmployeeDto(t.Junior.Id, t.Junior.Title, t.Junior.Name)));
         
         var content = new StringContent(JsonSerializer.Serialize(teamDtos), Encoding.UTF8, "application/json");
-        var response = await _httpClient.PostAsync(_hrDirectorUrl, content, stoppingToken);
+        var response = await _httpClient.PostAsync(_httpClient.BaseAddress + "api/hr_director/teams", content, stoppingToken);
         response.EnsureSuccessStatusCode();
         await Task.CompletedTask;
     }
