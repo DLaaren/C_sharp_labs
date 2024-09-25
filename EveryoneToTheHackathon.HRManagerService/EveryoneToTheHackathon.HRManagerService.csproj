@@ -17,4 +17,9 @@
         <DependentUpon>Dockerfile</DependentUpon>
       </Content>
     </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\EveryoneToTheHackathon.Dtos\EveryoneToTheHackathon.Dtos.csproj" />
+      <ProjectReference Include="..\EveryoneToTheHackathon.Entities\EveryoneToTheHackathon.Entities.csproj" />
+    </ItemGroup>
 </Project>

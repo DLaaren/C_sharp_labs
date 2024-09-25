@@ -2,10 +2,8 @@ using System.Text;
 using System.Text.Json;
 using EveryoneToTheHackathon.Dtos;
 using EveryoneToTheHackathon.Entities;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
-namespace EveryoneToTheHackathon.Services;
+namespace EveryoneToTheHackathon.HRManagerService;
 
 public class HRManagerService : BackgroundService
 {

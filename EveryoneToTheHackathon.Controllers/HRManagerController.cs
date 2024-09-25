@@ -10,11 +10,11 @@ namespace EveryoneToTheHackathon.Controllers;
 [Route("api/hr_manager")]
 public class HRManagerController : ControllerBase
 {
-    private readonly HRManagerService _hrManagerService;
+    private readonly HRManagerService.HRManagerService _hrManagerService;
     private static readonly ConcurrentBag<EmployeeDto> _employeetDtos = new();
     private static readonly ConcurrentBag<WishlistDto> _wishlistDtos = new();
 
-    public HRManagerController(HRManagerService hrManagerService)
+    public HRManagerController(HRManagerService.HRManagerService hrManagerService)
     {
         _hrManagerService = hrManagerService;
     }

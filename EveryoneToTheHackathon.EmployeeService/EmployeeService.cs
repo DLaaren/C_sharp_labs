@@ -9,11 +9,11 @@ public class EmployeeService : BackgroundService
 {
     private readonly ILogger<EmployeeService> _logger;
     private readonly HttpClient _httpClient;
-    private readonly string _hrManagerUrl;
+    private readonly Uri _hrManagerUrl;
     private readonly Employee _employee;
     private readonly IEnumerable<Employee> _probableTeammates;
 
-    public EmployeeService(ILogger<EmployeeService> logger, HttpClient httpClient, string hrManagerUrl, Employee employee, IEnumerable<Employee> probableTeammates)
+    public EmployeeService(ILogger<EmployeeService> logger, HttpClient httpClient, Uri hrManagerUrl, Employee employee, IEnumerable<Employee> probableTeammates)
     {
         _logger = logger;
         _httpClient = httpClient;
@@ -24,20 +24,20 @@ public class EmployeeService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await SendEmployeeAsync(_employee, stoppingToken);
-        _logger.LogInformation("Employee {0} {1} has sent his data;", _employee.Name, _employee.Title);
+        //await SendEmployeeAsync(_employee, stoppingToken);
+        _logger.LogInformation("Employee 'Id={0} Title={1} Name={2}' has sent his data;", _employee.Id, _employee.Title, _employee.Name);
         
-        _logger.LogInformation("Employee {0} {1} making his wishlist;", _employee.Name, _employee.Title);
+        _logger.LogInformation("Employee 'Id={0} Title={1} Name={2}' making his wishlist;", _employee.Id, _employee.Title, _employee.Name);
         Wishlist wishlist = _employee.MakeWishlist(_probableTeammates);
-        await SendWishlistAsync(wishlist, stoppingToken);
-        _logger.LogInformation("Employee {0} {1} has sent his wishlist;", _employee.Name, _employee.Title);
+        //await SendWishlistAsync(wishlist, stoppingToken);
+        _logger.LogInformation("Employee 'Id={0} Title={1} Name={2}' has sent his wishlist;", _employee.Id, _employee.Title, _employee.Name);
         
         await Task.CompletedTask;
     }
 
     private async Task SendEmployeeAsync(Employee employee, CancellationToken stoppingToken)
     {
-        EmployeeDto employeeDto = new EmployeeDto(_employee.Id, _employee.Title, _employee.Name);
+        EmployeeDto employeeDto = new EmployeeDto(employee.Id, employee.Title, employee.Name);
         var content = new StringContent(JsonSerializer.Serialize(employeeDto), Encoding.UTF8, "application/json");
         var response = await _httpClient.PostAsync(_hrManagerUrl, content, stoppingToken);
         response.EnsureSuccessStatusCode();

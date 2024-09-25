@@ -20,7 +20,13 @@ public class HackathonRepository(AppDbContext dbContext) : IHackathonRepository
 
     public void AddHackathon(IHackathon hackathon)
     {
-        _dbContext.Add(hackathon);
+        var allIds = _dbContext.Employees.Select(e => e.Id).ToList();
+        foreach (var employee in ((Hackathon)hackathon).Employees!)
+        {
+            if (! allIds.Contains(employee.Id))
+                _dbContext.Employees.Add(employee);
+        }
+        _dbContext.Entry(hackathon).State = EntityState.Added;
         _dbContext.SaveChanges();
     }
 
@@ -32,31 +38,6 @@ public class HackathonRepository(AppDbContext dbContext) : IHackathonRepository
 
     public void UpdateHackathon(IHackathon hackathon)
     {
-        /*var existingHackathon = _dbContext.Hackathons
-            .Include(h => h.Teams)
-            .Include(h => h.Employees)
-            .Include(h => h.Wishlists)
-            .FirstOrDefault(h => h.Id == ((Hackathon)updatedHackathon).Id);
-    
-        if (existingHackathon != null)
-        {
-            existingHackathon.MeanSatisfactionIndex = ((Hackathon)updatedHackathon).MeanSatisfactionIndex;
-    
-            existingHackathon.Teams = ((Hackathon)updatedHackathon).Teams;
-            existingHackathon.Employees = ((Hackathon)updatedHackathon).Employees;
-            existingHackathon.Wishlists = ((Hackathon)updatedHackathon).Wishlists;
-            foreach (var wishlist in existingHackathon.Wishlists)
-            {
-                var existingWishlist = _dbContext.Wishlists
-                    .FirstOrDefault(w => w.EmployeeId == wishlist.EmployeeId);
-                if (existingWishlist != null)
-                {
-                    existingWishlist.;
-                }
-            }
-
-            _dbContext.SaveChanges();
-        }*/
         _dbContext.Update(hackathon);
         _dbContext.SaveChanges();
 

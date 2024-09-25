@@ -1,3 +1,4 @@
+using System.Data;
 using System.Text.Json;
 using EveryoneToTheHackathon.Entities;
 using EveryoneToTheHackathon.Host;
@@ -12,12 +13,15 @@ var builder = Host.CreateApplicationBuilder(args);
 builder.Configuration.AddJsonFile("appsettings.json", true, true);
 
 Int32.TryParse(builder.Configuration["HackathonRounds"], out int totalRounds);
+
 totalRounds = totalRounds == 0 ? 1000 : totalRounds;
 List<Employee> teamLeads = (List<Employee>)CsvParser.ParseCsvFileWithEmployees(
     builder.Configuration["Resources:TeamLeadsList"] ?? "Resources/Teamleads20.csv", EmployeeTitle.TeamLead);
 List<Employee> juniors = (List<Employee>)CsvParser.ParseCsvFileWithEmployees(
     builder.Configuration["Resources:JuniorsList"] ?? "Resources/Juniors20.csv", EmployeeTitle.Junior);
 
+
+// todo conf exception
 string connString =
     String.Format(
         "Host={0};Port={1};Database={2};Username={3};Password={4};SSLMode=Prefer;Pooling=false",
@@ -50,8 +54,6 @@ builder.Services.AddTransient<IHackathonRepository, HackathonRepository>();
 builder.Services.AddTransient<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddTransient<IWishlistRepository, WishlistRepository>();
 builder.Services.AddTransient<ITeamRepository, TeamRepository>();
-
-builder.Services.AddHostedService<DbHostedService>();
 
 builder.Services.AddHostedService<HackathonHostedService>(h =>
     new HackathonHostedService(
