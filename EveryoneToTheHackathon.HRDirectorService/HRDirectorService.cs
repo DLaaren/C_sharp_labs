@@ -1,7 +1,5 @@
 using EveryoneToTheHackathon.Entities;
 using EveryoneToTheHackathon.Repositories;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 namespace EveryoneToTheHackathon.Services;
 

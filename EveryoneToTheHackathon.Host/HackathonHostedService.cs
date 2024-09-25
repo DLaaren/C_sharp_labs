@@ -51,7 +51,6 @@ public class HackathonHostedService : IHostedService
     private void StartHackathon(IHackathon hackathon, CancellationToken cancellationToken)
     {
         _hackathonRepository.AddHackathon(hackathon);
-
         cancellationToken.ThrowIfCancellationRequested();
         hackathon.HoldEvent();
         _hackathonRepository.UpdateHackathon(hackathon);
