@@ -20,8 +20,6 @@ List<Employee> teamLeads = (List<Employee>)CsvParser.ParseCsvFileWithEmployees(
 List<Employee> juniors = (List<Employee>)CsvParser.ParseCsvFileWithEmployees(
     builder.Configuration["Resources:JuniorsList"] ?? "Resources/Juniors20.csv", EmployeeTitle.Junior);
 
-
-// todo conf exception
 string connString =
     String.Format(
         "Host={0};Port={1};Database={2};Username={3};Password={4};SSLMode=Prefer;Pooling=false",
