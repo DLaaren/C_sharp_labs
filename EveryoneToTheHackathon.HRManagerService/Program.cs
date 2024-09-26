@@ -2,6 +2,7 @@ using EveryoneToTheHackathon.Entities;
 using EveryoneToTheHackathon.HRManagerService;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddEnvironmentVariables();
@@ -14,25 +15,25 @@ builder.WebHost.ConfigureKestrel(options =>
 });
 
 var employeesNumber = builder.Configuration.GetValue<int>("EMPLOYEES_NUM");
-Uri hrDirectorUrl = new Uri("http://hr_director:8083");
+var hrDirectorUrl = new Uri(builder.Configuration["HrDirectorUri"] ?? throw new SettingsException());
+
+builder.Services.AddHttpClient<HrManagerBackgroundService>(options => options.BaseAddress = hrDirectorUrl);
 
 builder.Services.AddMvc();
-builder.Services.AddTransient<HRManager>(_ =>
-    new HRManager(new ProposeAndRejectAlgorithm()));
+builder.Services.AddSingleton<HRManager>(_ => new HRManager(new ProposeAndRejectAlgorithm()));
 
 builder.Services.AddOptions();
 builder.Services.Configure<ControllerSettings>(settings => settings.EmployeesNumber = employeesNumber);
 
-builder.Services.AddHostedService<HRManagerService>(e =>
-    new HRManagerService(
-        e.GetRequiredService<ILogger<HRManagerService>>(),
-        e.GetRequiredService<HttpClient>(),
-        e.GetRequiredService<HRManager>()));
-        //employeesNumber));
+builder.Services.AddSingleton<HrManagerService>();
 
-//builder.Services.AddMvc().AddControllersAsServices().AddApplicationPart(typeof(HRManagerController).Assembly);
-builder.Services.AddControllers().AddApplicationPart(typeof(HRManagerController).Assembly);
-builder.Services.AddHttpClient<HRManagerService>(options => options.BaseAddress = hrDirectorUrl);
+builder.Services.AddHostedService<HrManagerBackgroundService>(s => 
+    new HrManagerBackgroundService(
+        s.GetRequiredService<ILogger<HrManagerBackgroundService>>(),
+        s.GetRequiredService<IHttpClientFactory>().CreateClient(nameof(HrManagerBackgroundService)),
+        s.GetRequiredService<HrManagerService>()));
+
+builder.Services.AddControllers().AddApplicationPart(typeof(HrManagerController).Assembly);
 
 var app = builder.Build();
 

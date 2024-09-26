@@ -18,6 +18,9 @@
       <Reference Include="Microsoft.AspNetCore">
         <HintPath>..\..\..\.nuget\packages\microsoft.aspnetcore.app.ref\8.0.7\ref\net8.0\Microsoft.AspNetCore.dll</HintPath>
       </Reference>
+      <Reference Include="Microsoft.VisualStudio.TestPlatform.ObjectModel">
+        <HintPath>..\..\..\.nuget\packages\microsoft.testplatform.testhost\17.11.1\lib\netcoreapp3.1\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
     <ItemGroup>

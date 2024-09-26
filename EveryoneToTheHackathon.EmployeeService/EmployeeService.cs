@@ -5,49 +5,39 @@ using EveryoneToTheHackathon.Entities;
 
 namespace EveryoneToTheHackathon.EmployeeService;
 
-public class EmployeeService : BackgroundService
+public class EmployeeService(
+    ILogger<EmployeeService> logger,
+    HttpClient httpClient,
+    Employee employee,
+    IEnumerable<Employee> probableTeammates)
+    : BackgroundService
 {
-    private readonly ILogger<EmployeeService> _logger;
-    private readonly HttpClient _httpClient;
-    private readonly Uri _hrManagerUrl;
-    private readonly Employee _employee;
-    private readonly IEnumerable<Employee> _probableTeammates;
-
-    public EmployeeService(ILogger<EmployeeService> logger, HttpClient httpClient, Uri hrManagerUrl, Employee employee, IEnumerable<Employee> probableTeammates)
-    {
-        _logger = logger;
-        _httpClient = httpClient;
-        _hrManagerUrl = hrManagerUrl;
-        _employee = employee;
-        _probableTeammates = probableTeammates;
-    }
-
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await SendEmployeeAsync(_employee, stoppingToken);
-        _logger.LogInformation("Employee 'Id = {0} Title = {1} Name = {2}' has sent his data;", _employee.Id, _employee.Title, _employee.Name);
+        await SendEmployeeAsync(employee, stoppingToken);
+        logger.LogInformation("Employee 'Id = {Id} Title = {Title} Name = {Name}' has sent his data;", employee.Id, employee.Title, employee.Name);
         
-        _logger.LogInformation("Employee 'Id = {0} Title = {1} Name = {2}' making his wishlist;", _employee.Id, _employee.Title, _employee.Name);
-        Wishlist wishlist = _employee.MakeWishlist(_probableTeammates);
+        logger.LogInformation("Employee 'Id = {Id} Title = {Title} Name = {Name}' is making his wishlist;", employee.Id, employee.Title, employee.Name);
+        var wishlist = employee.MakeWishlist(probableTeammates);
         await SendWishlistAsync(wishlist, stoppingToken);
-        _logger.LogInformation("Employee 'Id = {0} Title = {1} Name = {2}' has sent his wishlist;", _employee.Id, _employee.Title, _employee.Name);
+        logger.LogInformation("Employee 'Id = {Id} Title = {Title} Name = {Name}' has sent his wishlist;", employee.Id, employee.Title, employee.Name);
         
         await Task.CompletedTask;
     }
 
-    private async Task SendEmployeeAsync(Employee employee, CancellationToken stoppingToken)
+    private async Task SendEmployeeAsync(Employee employeeToSend, CancellationToken stoppingToken)
     {
-        EmployeeDto employeeDto = new EmployeeDto(employee.Id, employee.Title, employee.Name);
+        var employeeDto = new EmployeeDto(employeeToSend.Id, employeeToSend.Title, employeeToSend.Name);
         var content = new StringContent(JsonSerializer.Serialize(employeeDto), Encoding.UTF8, "application/json");
-        var response = await _httpClient.PostAsync(_hrManagerUrl + "api/hr_manager/employee", content, stoppingToken);
+        var response = await httpClient.PostAsync(httpClient.BaseAddress + "api/hr_manager/employee", content, stoppingToken);
         response.EnsureSuccessStatusCode();
     }
     
-    private async Task SendWishlistAsync(Wishlist wishlist, CancellationToken stoppingToken)
+    private async Task SendWishlistAsync(Wishlist wishlistToSend, CancellationToken stoppingToken)
     {
-        WishlistDto wishlistDto = new WishlistDto(wishlist.EmployeeId, wishlist.EmployeeTitle, wishlist.DesiredEmployees);
+        var wishlistDto = new WishlistDto(wishlistToSend.EmployeeId, wishlistToSend.EmployeeTitle, wishlistToSend.DesiredEmployees);
         var content = new StringContent(JsonSerializer.Serialize(wishlistDto), Encoding.UTF8, "application/json");
-        var response = await _httpClient.PostAsync(_hrManagerUrl + "api/hr_manager/wishlist", content, stoppingToken);
+        var response = await httpClient.PostAsync(httpClient.BaseAddress + "api/hr_manager/wishlist", content, stoppingToken);
         response.EnsureSuccessStatusCode();
     }
 }

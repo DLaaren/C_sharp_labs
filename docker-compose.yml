@@ -10,39 +10,39 @@
 
 services:
       
-  database:
-    image: "postgres:16-alpine"
-    container_name: postgresql
-    environment:
-      POSTGRES_USER: dlaaren
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: postgres
-      PGDATA: /var/lib/postgresql/data/pgdata
-
-    ports:
-      - "5432:5432"
-      
-    networks:
-      - database
-      - hackathon
-
-  hr_director:
-    image: "hackathon/hr_director:latest"
-    container_name: hr_director
-    
-    build:
-      context: .
-      dockerfile: EveryoneToTheHackathon.HRDirectorService/Dockerfile
-      
-    environment:
-      - EMPLOYEES_NUM=10
-      
-    depends_on:
-      - database
-      
-    networks:
-      - database
-      - hackathon
+#  database:
+#    image: "postgres:16-alpine"
+#    container_name: postgresql
+#    environment:
+#      POSTGRES_USER: dlaaren
+#      POSTGRES_PASSWORD: password
+#      POSTGRES_DB: postgres
+#      PGDATA: /var/lib/postgresql/data/pgdata
+#
+#    ports:
+#      - "5432:5432"
+#      
+#    networks:
+#      - database
+#      - hackathon
+#
+#  hr_director:
+#    image: "hackathon/hr_director:latest"
+#    container_name: hr_director
+#    
+#    build:
+#      context: .
+#      dockerfile: EveryoneToTheHackathon.HRDirectorService/Dockerfile
+#      
+#    environment:
+#      - EMPLOYEES_NUM=10
+#      
+#    depends_on:
+#      - database
+#      
+#    networks:
+#      - database
+#      - hackathon
         
   hr_manager:
     image: "hackathon/hr_manager:latest"
@@ -63,7 +63,7 @@ services:
         
   teamlead-1:
     image: "hackathon/employee:latest"
-    container_name: employee
+    container_name: teamlead-1
     
     build:
       context: .
@@ -82,7 +82,7 @@ services:
 
   teamlead-2:
     image: "hackathon/employee:latest"
-    container_name: employee
+    container_name: teamlead-2
 
     build:
       context: .
@@ -101,7 +101,7 @@ services:
 
   teamlead-3:
     image: "hackathon/employee:latest"
-    container_name: employee
+    container_name: teamlead-3
 
     build:
       context: .
@@ -120,7 +120,7 @@ services:
 
   teamlead-4:
     image: "hackathon/employee:latest"
-    container_name: employee
+    container_name: teamlead-4
 
     build:
       context: .
@@ -139,7 +139,7 @@ services:
 
   teamlead-5:
     image: "hackathon/employee:latest"
-    container_name: employee
+    container_name: teamlead-5
 
     build:
       context: .
@@ -158,7 +158,7 @@ services:
 
   junior-1:
     image: "hackathon/employee:latest"
-    container_name: employee
+    container_name: junior-1
 
     build:
       context: .
@@ -177,7 +177,7 @@ services:
 
   junior-2:
     image: "hackathon/employee:latest"
-    container_name: employee
+    container_name: junior-2
 
     build:
       context: .
@@ -196,7 +196,7 @@ services:
 
   junior-3:
     image: "hackathon/employee:latest"
-    container_name: employee
+    container_name: junior-3
 
     build:
       context: .
@@ -215,7 +215,7 @@ services:
 
   junior-4:
     image: "hackathon/employee:latest"
-    container_name: employee
+    container_name: junior-4
 
     build:
       context: .
@@ -234,7 +234,7 @@ services:
 
   junior-5:
     image: "hackathon/employee:latest"
-    container_name: employee
+    container_name: junior-5
 
     build:
       context: .

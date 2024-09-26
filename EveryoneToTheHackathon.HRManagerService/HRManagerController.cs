@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using EveryoneToTheHackathon.Dtos;
 using EveryoneToTheHackathon.Entities;
 using Microsoft.AspNetCore.Authorization;
@@ -10,36 +11,31 @@ namespace EveryoneToTheHackathon.HRManagerService;
 
 [ApiController]
 [Route("api/hr_manager")]
-public class HRManagerController : ControllerBase
+public class HrManagerController(IOptions<ControllerSettings> settingsOptions, HrManagerService hrManagerService)
+    : ControllerBase
 {
-    private static readonly ConcurrentBag<EmployeeDto> _employeetDtos = new();
-    private static readonly ConcurrentBag<WishlistDto> _wishlistDtos = new();
-    
-    private readonly HRManagerService _hrManagerService;
-    private readonly ControllerSettings _settings;
+    private static readonly ConcurrentBag<EmployeeDto> EmployeeDtos = [];
+    private static readonly ConcurrentBag<WishlistDto> WishlistDtos = [];
 
-    public HRManagerController(HRManagerService hrManagerService, IOptions<ControllerSettings> settingsOptions)
-    {
-        _hrManagerService = hrManagerService;
-        _settings = settingsOptions.Value;
-    }
+    private HrManagerService HrManagerService { get; } = hrManagerService;
+    private readonly ControllerSettings _settings = settingsOptions.Value;
 
     [HttpPost("employee"), AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesDefaultResponseType]
     public Task<IActionResult> GetEmployees([FromBody] EmployeeDto employeeDto)
     {
-        _employeetDtos.Add(employeeDto);
+        EmployeeDtos.Add(employeeDto);
 
-        if (_employeetDtos.Count >= _settings.EmployeesNumber)
-        {
-            var employees = new List<EmployeeDto>(_employeetDtos).
-                Select(eDto => new Employee(eDto.Id, eDto.Title, eDto.Name));
+        if (EmployeeDtos.Count < _settings.EmployeesNumber) return Task.FromResult<IActionResult>(Ok());
+        
+        var employees = new List<EmployeeDto>(EmployeeDtos).
+            Select(eDto => new Employee(eDto.Id, eDto.Title, eDto.Name)).ToList();
             
-            _employeetDtos.Clear();
+        EmployeeDtos.Clear();
 
-            _hrManagerService.Employees = employees;
-        }
+        HrManagerService.Employees = employees;
+        Debug.Assert(HrManagerService.Employees!.Count == _settings.EmployeesNumber);
 
         return Task.FromResult<IActionResult>(Ok());
     }
@@ -49,17 +45,17 @@ public class HRManagerController : ControllerBase
     [ProducesDefaultResponseType]
     public Task<IActionResult> GetWishlists([FromBody] WishlistDto wishlistDto)
     {
-        _wishlistDtos.Add(wishlistDto);
+        WishlistDtos.Add(wishlistDto);
 
-        if (_wishlistDtos.Count >= _settings.EmployeesNumber)
-        {
-            var wishlists = new List<WishlistDto>(_wishlistDtos).
-                Select(wDto => new Wishlist(wDto.EmployeeId, wDto.EmployeeTitle, wDto.DesiredEmployees));
+        if (WishlistDtos.Count < _settings.EmployeesNumber) return Task.FromResult<IActionResult>(Ok());
+        
+        var wishlists = new List<WishlistDto>(WishlistDtos).
+            Select(wDto => new Wishlist(wDto.EmployeeId, wDto.EmployeeTitle, wDto.DesiredEmployees)).ToList();
             
-            _wishlistDtos.Clear();
+        WishlistDtos.Clear();
 
-            _hrManagerService.Wishlists = wishlists;
-        }
+        HrManagerService.Wishlists = wishlists;
+        Debug.Assert(HrManagerService.Wishlists!.Count == _settings.EmployeesNumber);
 
         return Task.FromResult<IActionResult>(Ok());
     }
