@@ -1,40 +1,70 @@
+using System.Diagnostics;
 using EveryoneToTheHackathon.Dtos;
 using EveryoneToTheHackathon.Entities;
-using EveryoneToTheHackathon.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
-namespace EveryoneToTheHackathon.Controllers;
+namespace EveryoneToTheHackathon.HRDirectorService;
 
 [ApiController]
 [Route("api/hr_director")]
-public class HrDirectorController(HRDirectorService hrDirectorService) : ControllerBase
+public class HrDirectorController(IOptions<ControllerSettings> settingsOptions, HrDirectorService hrDirectorService)
+    : ControllerBase
 {
-    [HttpPost("employees")]
-    public void GetEmployees([FromBody] List<EmployeeDto> employeeDtos)
+    private HrDirectorService HrDirectorService { get; } = hrDirectorService;
+    private readonly ControllerSettings _settings = settingsOptions.Value;
+    
+    [HttpPost("employees"), AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesDefaultResponseType]
+    public Task<IActionResult> GetEmployees([FromBody] List<EmployeeDto> employeeDtos)
     {
         var employees = employeeDtos.
             Select(eDto => new Employee(eDto.Id, eDto.Title, eDto.Name)).ToList();
+        
+        Debug.Assert(employees.Count == _settings.EmployeesNumber);
 
-        hrDirectorService.Employees = employees;
+        HrDirectorService.Employees = employees;
+        
+        return Task.FromResult<IActionResult>(Ok());
     }
 
-    [HttpPost("wishlists")]
-    public void GetWishlists([FromBody] List<WishlistDto> wishlistDtos)
+    [HttpPost("wishlists"), AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesDefaultResponseType]
+    public Task<IActionResult> GetWishlists([FromBody] List<WishlistDto> wishlistDtos)
     {
         var wishlists = wishlistDtos.
             Select(wDto => new Wishlist(wDto.EmployeeId, wDto.EmployeeTitle, wDto.DesiredEmployees)).ToList();
 
-        hrDirectorService.Wishlists = wishlists;
+        Debug.Assert(wishlists.Count == _settings.EmployeesNumber);
+        
+        HrDirectorService.Wishlists = wishlists;
+        
+        return Task.FromResult<IActionResult>(Ok());
     }
     
-    [HttpPost("teams")]
-    public void GetTeams([FromBody] List<TeamDto> teamDtos)
+    [HttpPost("teams"), AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesDefaultResponseType]
+    public Task<IActionResult> GetTeams([FromBody] List<TeamDto> teamDtos)
     {
         var teams = teamDtos.
             Select(tDto => new Team(
                 new Employee(tDto.TeamLead.Id, tDto.TeamLead.Title, tDto.TeamLead.Name), 
                 new Employee(tDto.Junior.Id, tDto.Junior.Title, tDto.Junior.Name))).ToList();
 
-        hrDirectorService.Teams = teams;
+        Debug.Assert(teams.Count == _settings.EmployeesNumber / 2);
+        
+        HrDirectorService.Teams = teams;
+        
+        return Task.FromResult<IActionResult>(Ok());
     }
+    
+    [HttpGet("health"), AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesDefaultResponseType]
+    public Task<IActionResult> HealthCheck() => Task.FromResult<IActionResult>(Ok());
 }

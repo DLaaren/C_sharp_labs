@@ -34,6 +34,5 @@ public sealed class AppDbContext : DbContext
         modelBuilder.Ignore<HRDirector>();
         modelBuilder.Ignore<HRManager>();
         modelBuilder.Ignore<ProposeAndRejectAlgorithm>();
-        
     }
 }

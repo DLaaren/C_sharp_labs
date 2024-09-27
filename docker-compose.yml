@@ -10,39 +10,54 @@
 
 services:
       
-#  database:
-#    image: "postgres:16-alpine"
-#    container_name: postgresql
-#    environment:
-#      POSTGRES_USER: dlaaren
-#      POSTGRES_PASSWORD: password
-#      POSTGRES_DB: postgres
-#      PGDATA: /var/lib/postgresql/data/pgdata
-#
-#    ports:
-#      - "5432:5432"
-#      
-#    networks:
-#      - database
-#      - hackathon
-#
-#  hr_director:
-#    image: "hackathon/hr_director:latest"
-#    container_name: hr_director
-#    
-#    build:
-#      context: .
-#      dockerfile: EveryoneToTheHackathon.HRDirectorService/Dockerfile
-#      
-#    environment:
-#      - EMPLOYEES_NUM=10
-#      
-#    depends_on:
-#      - database
-#      
-#    networks:
-#      - database
-#      - hackathon
+  database:
+    image: "postgres:16-alpine"
+    container_name: postgresql
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: hackathon
+      PGDATA: /var/lib/postgresql/data/pgdata
+      
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 5s
+
+    ports:
+      - "5433:5432"
+
+    networks:
+      - database
+      - hackathon
+
+  hr_director:
+    image: "hackathon/hr_director:latest"
+    container_name: hr_director
+
+    build:
+      context: .
+      dockerfile: EveryoneToTheHackathon.HRDirectorService/Dockerfile
+
+    environment:
+      - EMPLOYEES_NUM=10
+      
+    healthcheck:
+      test: [ "CMD-SHELL", "curl --fail http://localhost:8083/api/hr_director/health || exit 1" ]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 5s
+
+    depends_on:
+      database:
+        condition: service_healthy
+
+    networks:
+      - database
+      - hackathon
         
   hr_manager:
     image: "hackathon/hr_manager:latest"
@@ -55,8 +70,16 @@ services:
     environment:
       - EMPLOYEES_NUM=10
       
-#    depends_on:
-#      - hr_director
+    healthcheck:
+      test: [ "CMD-SHELL", "curl --fail http://localhost:8082/api/hr_manager/health || exit 1" ]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 5s
+      
+    depends_on:
+      hr_director:
+        condition: service_healthy
     
     networks:
       - hackathon
@@ -75,7 +98,8 @@ services:
       - NAME=Филиппова Ульяна
     
     depends_on:
-      - 'hr_manager'
+      hr_manager:
+        condition: service_healthy
     
     networks:
       - hackathon
@@ -94,7 +118,8 @@ services:
       - NAME=Николаев Григорий
 
     depends_on:
-      - 'hr_manager'
+      hr_manager:
+        condition: service_healthy
 
     networks:
       - hackathon
@@ -113,7 +138,8 @@ services:
       - NAME=Андреева Вероника
 
     depends_on:
-      - 'hr_manager'
+      hr_manager:
+        condition: service_healthy
 
     networks:
       - hackathon
@@ -132,7 +158,8 @@ services:
       - NAME=Коротков Михаил
 
     depends_on:
-      - 'hr_manager'
+      hr_manager:
+        condition: service_healthy
 
     networks:
       - hackathon
@@ -151,7 +178,8 @@ services:
       - NAME=Кузнецов Александр
 
     depends_on:
-      - 'hr_manager'
+      hr_manager:
+        condition: service_healthy
 
     networks:
       - hackathon
@@ -170,7 +198,8 @@ services:
       - NAME=Юдин Адам
 
     depends_on:
-      - 'hr_manager'
+      hr_manager:
+        condition: service_healthy
 
     networks:
       - hackathon
@@ -189,7 +218,8 @@ services:
       - NAME=Яшина Яна
 
     depends_on:
-      - 'hr_manager'
+      hr_manager:
+        condition: service_healthy
 
     networks:
       - hackathon
@@ -208,7 +238,8 @@ services:
       - NAME=Никитина Вероника
 
     depends_on:
-      - 'hr_manager'
+      hr_manager:
+        condition: service_healthy
 
     networks:
       - hackathon
@@ -227,7 +258,8 @@ services:
       - NAME=Рябинин Александр
 
     depends_on:
-      - 'hr_manager'
+      hr_manager:
+        condition: service_healthy
 
     networks:
       - hackathon
@@ -246,7 +278,8 @@ services:
       - NAME=Ильин Тимофей
 
     depends_on:
-      - 'hr_manager'
+      hr_manager:
+        condition: service_healthy
 
     networks:
       - hackathon
