@@ -59,4 +59,9 @@ public class HrManagerController(IOptions<ControllerSettings> settingsOptions, H
 
         return Task.FromResult<IActionResult>(Ok());
     }
+    
+    [HttpGet("health"), AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesDefaultResponseType]
+    public Task<IActionResult> HealthCheck() => Task.FromResult<IActionResult>(Ok());
 }

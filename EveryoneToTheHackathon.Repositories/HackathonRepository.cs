@@ -4,9 +4,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EveryoneToTheHackathon.Repositories;
 
-public class HackathonRepository(AppDbContext dbContext) : IHackathonRepository
+public class HackathonRepository(/*AppDbContext dbContext,*/ IDbContextFactory<AppDbContext> myDbContextFactory) : IHackathonRepository
 {
-    private readonly AppDbContext _dbContext = dbContext;
+    private AppDbContext _dbContext = myDbContextFactory.CreateDbContext();
+    //private readonly AppDbContext _dbContext = dbContext;
 
     public IHackathon? GetHackathonById(int hackathonId)
     {

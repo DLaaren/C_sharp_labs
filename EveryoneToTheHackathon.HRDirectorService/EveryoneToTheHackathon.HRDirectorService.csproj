@@ -11,7 +11,8 @@
         <PackageReference Include="FactoryMind.AspNetCore" Version="5.0.19" />
         <PackageReference Include="FactoryMind.AspNetCore.App" Version="5.0.19" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0-rc.1.24431.7" />
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.0-rc.1" />
     </ItemGroup>
 
     <ItemGroup>
@@ -22,11 +23,15 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\EveryoneToTheHackathon.Dtos\EveryoneToTheHackathon.Dtos.csproj" />
       <ProjectReference Include="..\EveryoneToTheHackathon.Entities\EveryoneToTheHackathon.Entities.csproj" />
       <ProjectReference Include="..\EveryoneToTheHackathon.Repositories\EveryoneToTheHackathon.Repositories.csproj" />
     </ItemGroup>
 
     <ItemGroup>
+      <Reference Include="Microsoft.VisualStudio.TestPlatform.ObjectModel">
+        <HintPath>..\..\..\.nuget\packages\microsoft.testplatform.testhost\17.11.1\lib\netcoreapp3.1\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll</HintPath>
+      </Reference>
       <Reference Include="Npgsql.EntityFrameworkCore.PostgreSQL">
         <HintPath>..\..\..\.nuget\packages\npgsql.entityframeworkcore.postgresql\9.0.0-rc.1\lib\net8.0\Npgsql.EntityFrameworkCore.PostgreSQL.dll</HintPath>
       </Reference>
