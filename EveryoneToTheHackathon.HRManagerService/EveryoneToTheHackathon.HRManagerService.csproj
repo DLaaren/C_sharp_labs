@@ -28,6 +28,7 @@
     <ItemGroup>
       <ProjectReference Include="..\EveryoneToTheHackathon.Dtos\EveryoneToTheHackathon.Dtos.csproj" />
       <ProjectReference Include="..\EveryoneToTheHackathon.Entities\EveryoneToTheHackathon.Entities.csproj" />
+      <ProjectReference Include="..\EveryoneToTheHackathon.Messages\EveryoneToTheHackathon.Messages.csproj" />
     </ItemGroup>
 
     <ItemGroup>

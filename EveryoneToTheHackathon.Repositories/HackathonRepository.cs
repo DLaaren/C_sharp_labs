@@ -43,9 +43,9 @@ public class HackathonRepository(/*AppDbContext dbContext,*/ IDbContextFactory<A
 
     public void UpdateHackathon(IHackathon hackathon)
     {
+        _dbContext.UpdateRange(((Hackathon)hackathon).Employees);
         _dbContext.Update(hackathon);
         _dbContext.SaveChanges();
-
     }
 
     public void UpdateHackathons(IEnumerable<IHackathon> hackathons)

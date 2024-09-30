@@ -16,7 +16,6 @@ public class EmployeeBackgroundService(
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         logger.LogInformation("Waiting for a hackathon to start");
-
         await employeeService.HackathonStartedTcs.Task;
 
         await SendEmployeeAsync(employeeService.Employee, stoppingToken);
@@ -51,7 +50,7 @@ public class EmployeeBackgroundService(
 
     public Task Consume(ConsumeContext<IHackathonStarted> context)
     {
-        logger.LogInformation("Hackathon {id} has started", context.Message.HackathonId);
+        logger.LogInformation(context.Message.Message);
         employeeService.HackathonStartedTcs.SetResult(true);
         return Task.CompletedTask;
     }

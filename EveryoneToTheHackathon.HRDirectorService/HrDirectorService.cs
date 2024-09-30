@@ -13,8 +13,6 @@ public class HrDirectorService(HRDirector hrDirector, IHackathonRepository hacka
     public List<Wishlist>? Wishlists { get; set; }
     public List<Team>? Teams { get; set; }
 
-    private Hackathon? _hackathon;
-
     public double CalculationMeanSatisfactionIndex()
     {
         var meanSatisfactionIndex = HrDirector.CalculateMeanSatisfactionIndex(
@@ -23,28 +21,34 @@ public class HrDirectorService(HRDirector hrDirector, IHackathonRepository hacka
             Teams!);
         return meanSatisfactionIndex;
     }
-
-    public int StartHackathon()
-    {
-        _hackathon = new Hackathon();
-        HackathonRepository.AddHackathon(_hackathon);
-        return _hackathon.Id;
-    } 
     
     public void SaveHackathon(double meanSatisfactionIndex)
     {
-        Debug.Assert(_hackathon != null);
-        _hackathon.MeanSatisfactionIndex = meanSatisfactionIndex;
-        _hackathon.Employees = Employees;
-        _hackathon.Wishlists = Wishlists;
-        _hackathon.Teams = Teams;
-        Teams!.ForEach(t =>
+        Hackathon hackathon = new Hackathon
         {
-            t.Hackathon = _hackathon;
-            t.HackathonId = _hackathon.Id;
-        });
-        Employees!.ForEach(e => ((List<Team>)e.Teams!).AddRange( Teams.FindAll(t => t.TeamLead.Equals(e) || t.Junior.Equals(e))) );
+            Employees = Employees
+        };
+        HackathonRepository.AddHackathon(hackathon);
         
-        HackathonRepository.UpdateHackathon(_hackathon);
+        hackathon.Employees = Employees;
+        hackathon.Wishlists = Wishlists;
+        hackathon.Teams = Teams;
+        hackathon.MeanSatisfactionIndex = meanSatisfactionIndex;
+        
+        ((List<Team>)hackathon.Teams!).ForEach(t =>
+        {
+            t.Hackathon = hackathon;
+            t.HackathonId = hackathon.Id;
+        });
+
+        ((List<Employee>)hackathon.Employees!).
+            ForEach(e => 
+                ((List<Team>)e.Teams!).
+                    AddRange( ((List<Team>)hackathon.Teams).
+                    FindAll(t => (t.TeamLead.Id.Equals(e.Id) && t.TeamLead.Title.Equals(e.Title)) || (t.Junior.Id.Equals(e.Id) && t.Junior.Title.Equals(e.Title))
+                    )));
+        
+        
+        HackathonRepository.UpdateHackathon(hackathon);
     }
 }
