@@ -31,9 +31,6 @@ public class HrDirectorBackgroundService(
 
     private async Task AnnounceHackathon(CancellationToken stoppingToken)
     {
-        await busControl.Publish<IHackathonStarted>(new
-        {
-            HackathonId = hrDirectorService.StartHackathon()
-        }, stoppingToken);
+        await busControl.Publish<IHackathonStarted>("Hackathon has started", stoppingToken);
     }
 }

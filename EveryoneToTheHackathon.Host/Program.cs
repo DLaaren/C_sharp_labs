@@ -1,4 +1,3 @@
-using System.Data;
 using System.Text.Json;
 using EveryoneToTheHackathon.Entities;
 using EveryoneToTheHackathon.Host;
@@ -30,7 +29,7 @@ string connString =
         builder.Configuration["Database:Password"] ?? throw new JsonException()
     );
 
-builder.Services.AddDbContext<AppDbContext>(options =>
+builder.Services.AddDbContextFactory<AppDbContext>(options =>
 {
     options.UseNpgsql(connString);
     options.EnableDetailedErrors();

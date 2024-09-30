@@ -2,7 +2,7 @@ using EveryoneToTheHackathon.Entities;
 
 namespace EveryoneToTheHackathon.Messages;
 
-public interface IWishlistsSubmitted
+public interface IWishlistSent
 {
     int EmployeeId { get; }
     string EmployeeTitle { get; }

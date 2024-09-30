@@ -2,6 +2,8 @@ using System.Text;
 using System.Text.Json;
 using EveryoneToTheHackathon.Dtos;
 using EveryoneToTheHackathon.Entities;
+using EveryoneToTheHackathon.Messages;
+using MassTransit;
 
 namespace EveryoneToTheHackathon.HRManagerService;
 
@@ -9,10 +11,13 @@ public class HrManagerBackgroundService(
     ILogger<HrManagerBackgroundService> logger,
     HttpClient httpClient,
     HrManagerService hrManagerService)
-    : BackgroundService
+    : BackgroundService, IConsumer<IHackathonStarted>
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        logger.LogInformation("Waiting for a hackathon to start");
+        await hrManagerService.HackathonStartedTcs.Task;
+        
         logger.LogInformation("HRManager waiting for employees;");
 
         while (hrManagerService.Employees == null)
@@ -74,4 +79,11 @@ public class HrManagerBackgroundService(
         response.EnsureSuccessStatusCode();
         await Task.CompletedTask;
     }
+    
+        public Task Consume(ConsumeContext<IHackathonStarted> context)
+       {
+           logger.LogInformation(context.Message.Message);
+           hrManagerService.HackathonStartedTcs.SetResult(true);
+           return Task.CompletedTask;
+       }
 }

@@ -2,5 +2,5 @@ namespace EveryoneToTheHackathon.Messages;
 
 public interface IHackathonStarted
 {
-    int HackathonId { get; }
+    string Message { get; }
 }

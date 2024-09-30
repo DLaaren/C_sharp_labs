@@ -18,6 +18,16 @@ builder.WebHost.ConfigureKestrel(options =>
 var employeesNumber = builder.Configuration.GetValue<int>("EMPLOYEES_NUM");
 var hrDirectorUrl = new Uri(builder.Configuration["HrDirectorUri"] ?? throw new SettingsException());
 
+builder.Services.AddMassTransit(x =>
+{
+    x.AddConsumer<HrManagerBackgroundService>();
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host(new Uri("amqp://rabbitmq:5672/"));
+        cfg.ReceiveEndpoint($"HRManager", e => e.ConfigureConsumers(context));
+    });
+});
+
 builder.Services.AddHttpClient<HrManagerBackgroundService>(options => options.BaseAddress = hrDirectorUrl);
 builder.Services.AddMvc();
 builder.Services.AddSingleton<HRManager>(_ => new HRManager(new ProposeAndRejectAlgorithm()));

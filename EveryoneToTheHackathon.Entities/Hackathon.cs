@@ -62,7 +62,7 @@ public class Hackathon : IHackathon
             t.HackathonId = Id;
         });
         
-        ((List<Employee>)Employees).ForEach(e => ((List<Team>)e.Teams).AddRange( ((List<Team>)Teams).FindAll(t => t.TeamLead.Equals(e) || t.Junior.Equals(e))) );
+        ((List<Employee>)Employees!).ForEach(e => ((List<Team>)e.Teams!).AddRange( ((List<Team>)Teams).FindAll(t => t.TeamLead.Equals(e) || t.Junior.Equals(e))) );
     }
     
     public void HoldEvent(IEnumerable<Wishlist> teamLeadsWishlists, IEnumerable<Wishlist> juniorsWishlists)
@@ -80,5 +80,7 @@ public class Hackathon : IHackathon
             t.Hackathon = this;
             t.HackathonId = Id;
         });
+        
+        ((List<Employee>)Employees!).ForEach(e => ((List<Team>)e.Teams!).AddRange( ((List<Team>)Teams).FindAll(t => t.TeamLead.Equals(e) || t.Junior.Equals(e))) );
     }
 }
