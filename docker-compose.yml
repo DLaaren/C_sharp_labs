@@ -1,15 +1,17 @@
 ﻿networks:
-  
   database:
     name: database
     driver: bridge
   hackathon:
     name: hackathon
     driver: bridge
+  rabbitmq:
+    name: rabbitmq
+    driver: bridge
 
 
 services:
-      
+    
   database:
     image: "postgres:16-alpine"
     container_name: postgresql
@@ -32,6 +34,26 @@ services:
     networks:
       - database
       - hackathon
+        
+        
+  rabbitmq:
+    image: "rabbitmq:4-management-alpine"
+    container_name: rabbitmq
+    
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+      
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 5s
+    
+    networks:
+      - rabbitmq
+
 
   hr_director:
     image: "hackathon/hr_director:latest"
@@ -54,10 +76,38 @@ services:
     depends_on:
       database:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+        
+      teamlead-1:
+        condition: service_healthy
+      teamlead-2:
+        condition: service_healthy
+      teamlead-3:
+        condition: service_healthy
+      teamlead-4:
+        condition: service_healthy
+      teamlead-5:
+        condition: service_healthy
+      junior-1:
+        condition: service_healthy
+      junior-2:
+        condition: service_healthy
+      junior-3:
+        condition: service_healthy
+      junior-4:
+        condition: service_healthy
+      junior-5:
+        condition: service_healthy
+      
+      hr_manager:
+        condition: service_healthy
 
     networks:
       - database
       - hackathon
+      - rabbitmq
+        
         
   hr_manager:
     image: "hackathon/hr_manager:latest"
@@ -78,11 +128,13 @@ services:
       start_period: 5s
       
     depends_on:
-      hr_director:
+      rabbitmq:
         condition: service_healthy
     
     networks:
       - hackathon
+      - rabbitmq
+        
         
   teamlead-1:
     image: "hackathon/employee:latest"
@@ -96,13 +148,22 @@ services:
       - ID=1
       - TITLE=TeamLead
       - NAME=Филиппова Ульяна
+        
+    healthcheck:
+      test: [ "CMD-SHELL", "curl --fail http://localhost:8081/api/employee/health || exit 1" ]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 5s
     
     depends_on:
-      hr_manager:
+      rabbitmq:
         condition: service_healthy
     
     networks:
       - hackathon
+      - rabbitmq
+
 
   teamlead-2:
     image: "hackathon/employee:latest"
@@ -117,12 +178,21 @@ services:
       - TITLE=TeamLead
       - NAME=Николаев Григорий
 
+    healthcheck:
+      test: [ "CMD-SHELL", "curl --fail http://localhost:8081/api/employee/health || exit 1" ]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 5s
+
     depends_on:
-      hr_manager:
+      rabbitmq:
         condition: service_healthy
 
     networks:
       - hackathon
+      - rabbitmq
+
 
   teamlead-3:
     image: "hackathon/employee:latest"
@@ -137,12 +207,21 @@ services:
       - TITLE=TeamLead
       - NAME=Андреева Вероника
 
+    healthcheck:
+      test: [ "CMD-SHELL", "curl --fail http://localhost:8081/api/employee/health || exit 1" ]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 5s
+
     depends_on:
-      hr_manager:
+      rabbitmq:
         condition: service_healthy
 
     networks:
       - hackathon
+      - rabbitmq
+
 
   teamlead-4:
     image: "hackathon/employee:latest"
@@ -157,12 +236,21 @@ services:
       - TITLE=TeamLead
       - NAME=Коротков Михаил
 
+    healthcheck:
+      test: [ "CMD-SHELL", "curl --fail http://localhost:8081/api/employee/health || exit 1" ]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 5s
+
     depends_on:
-      hr_manager:
+      rabbitmq:
         condition: service_healthy
 
     networks:
       - hackathon
+      - rabbitmq
+
 
   teamlead-5:
     image: "hackathon/employee:latest"
@@ -177,12 +265,21 @@ services:
       - TITLE=TeamLead
       - NAME=Кузнецов Александр
 
+    healthcheck:
+      test: [ "CMD-SHELL", "curl --fail http://localhost:8081/api/employee/health || exit 1" ]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 5s
+
     depends_on:
-      hr_manager:
+      rabbitmq:
         condition: service_healthy
 
     networks:
       - hackathon
+      - rabbitmq
+
 
   junior-1:
     image: "hackathon/employee:latest"
@@ -197,12 +294,21 @@ services:
       - TITLE=Junior
       - NAME=Юдин Адам
 
+    healthcheck:
+      test: [ "CMD-SHELL", "curl --fail http://localhost:8081/api/employee/health || exit 1" ]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 5s
+
     depends_on:
-      hr_manager:
+      rabbitmq:
         condition: service_healthy
 
     networks:
       - hackathon
+      - rabbitmq
+
 
   junior-2:
     image: "hackathon/employee:latest"
@@ -217,12 +323,21 @@ services:
       - TITLE=Junior
       - NAME=Яшина Яна
 
+    healthcheck:
+      test: [ "CMD-SHELL", "curl --fail http://localhost:8081/api/employee/health || exit 1" ]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 5s
+
     depends_on:
-      hr_manager:
+      rabbitmq:
         condition: service_healthy
 
     networks:
       - hackathon
+      - rabbitmq
+
 
   junior-3:
     image: "hackathon/employee:latest"
@@ -237,12 +352,21 @@ services:
       - TITLE=Junior
       - NAME=Никитина Вероника
 
+    healthcheck:
+      test: [ "CMD-SHELL", "curl --fail http://localhost:8081/api/employee/health || exit 1" ]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 5s
+
     depends_on:
-      hr_manager:
+      rabbitmq:
         condition: service_healthy
 
     networks:
       - hackathon
+      - rabbitmq
+
 
   junior-4:
     image: "hackathon/employee:latest"
@@ -257,12 +381,21 @@ services:
       - TITLE=Junior
       - NAME=Рябинин Александр
 
+    healthcheck:
+      test: [ "CMD-SHELL", "curl --fail http://localhost:8081/api/employee/health || exit 1" ]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 5s
+
     depends_on:
-      hr_manager:
+      rabbitmq:
         condition: service_healthy
 
     networks:
       - hackathon
+      - rabbitmq
+
 
   junior-5:
     image: "hackathon/employee:latest"
@@ -277,9 +410,17 @@ services:
       - TITLE=Junior
       - NAME=Ильин Тимофей
 
+    healthcheck:
+      test: [ "CMD-SHELL", "curl --fail http://localhost:8081/api/employee/health || exit 1" ]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 5s
+
     depends_on:
-      hr_manager:
+      rabbitmq:
         condition: service_healthy
 
     networks:
       - hackathon
+      - rabbitmq

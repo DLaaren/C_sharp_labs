@@ -21,12 +21,16 @@ public class HackathonRepository(/*AppDbContext dbContext,*/ IDbContextFactory<A
 
     public void AddHackathon(IHackathon hackathon)
     {
-        var allIds = _dbContext.Employees.Select(e => e.Id).ToList();
-        foreach (var employee in ((Hackathon)hackathon).Employees!)
+        if (((Hackathon)hackathon).Employees != null)
         {
-            if (! allIds.Contains(employee.Id))
-                _dbContext.Employees.Add(employee);
+            var allIds = _dbContext.Employees.Select(e => e.Id).ToList();
+            foreach (var employee in ((Hackathon)hackathon).Employees!)
+            {
+                if (!allIds.Contains(employee.Id))
+                    _dbContext.Employees.Add(employee);
+            }
         }
+
         _dbContext.Entry(hackathon).State = EntityState.Added;
         _dbContext.SaveChanges();
     }

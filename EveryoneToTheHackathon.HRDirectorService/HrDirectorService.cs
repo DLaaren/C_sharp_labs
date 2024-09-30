@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using EveryoneToTheHackathon.Entities;
 using EveryoneToTheHackathon.Repositories;
 
@@ -12,6 +13,8 @@ public class HrDirectorService(HRDirector hrDirector, IHackathonRepository hacka
     public List<Wishlist>? Wishlists { get; set; }
     public List<Team>? Teams { get; set; }
 
+    private Hackathon? _hackathon;
+
     public double CalculationMeanSatisfactionIndex()
     {
         var meanSatisfactionIndex = HrDirector.CalculateMeanSatisfactionIndex(
@@ -20,24 +23,28 @@ public class HrDirectorService(HRDirector hrDirector, IHackathonRepository hacka
             Teams!);
         return meanSatisfactionIndex;
     }
+
+    public int StartHackathon()
+    {
+        _hackathon = new Hackathon();
+        HackathonRepository.AddHackathon(_hackathon);
+        return _hackathon.Id;
+    } 
     
     public void SaveHackathon(double meanSatisfactionIndex)
     {
-        Hackathon hackathon = new Hackathon();
-        hackathon.Employees = Employees;
-        HackathonRepository.AddHackathon(hackathon);
-        
-        hackathon.MeanSatisfactionIndex = meanSatisfactionIndex;
-        hackathon.Employees = Employees;
-        hackathon.Wishlists = Wishlists;
-        hackathon.Teams = Teams;
+        Debug.Assert(_hackathon != null);
+        _hackathon.MeanSatisfactionIndex = meanSatisfactionIndex;
+        _hackathon.Employees = Employees;
+        _hackathon.Wishlists = Wishlists;
+        _hackathon.Teams = Teams;
         Teams!.ForEach(t =>
         {
-            t.Hackathon = hackathon;
-            t.HackathonId = hackathon.Id;
+            t.Hackathon = _hackathon;
+            t.HackathonId = _hackathon.Id;
         });
         Employees!.ForEach(e => ((List<Team>)e.Teams!).AddRange( Teams.FindAll(t => t.TeamLead.Equals(e) || t.Junior.Equals(e))) );
         
-        HackathonRepository.UpdateHackathon(hackathon);
+        HackathonRepository.UpdateHackathon(_hackathon);
     }
 }
