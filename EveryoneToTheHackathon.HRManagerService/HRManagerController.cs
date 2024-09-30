@@ -21,8 +21,6 @@ public class HrManagerController(IOptions<ControllerSettings> settingsOptions, H
     private readonly ControllerSettings _settings = settingsOptions.Value;
 
     [HttpPost("employee"), AllowAnonymous]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesDefaultResponseType]
     public Task<IActionResult> GetEmployees([FromBody] EmployeeDto employeeDto)
     {
         EmployeeDtos.Add(employeeDto);
@@ -41,8 +39,6 @@ public class HrManagerController(IOptions<ControllerSettings> settingsOptions, H
     }
     
     [HttpPost("wishlist"), AllowAnonymous]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesDefaultResponseType]
     public Task<IActionResult> GetWishlists([FromBody] WishlistDto wishlistDto)
     {
         WishlistDtos.Add(wishlistDto);
@@ -61,7 +57,5 @@ public class HrManagerController(IOptions<ControllerSettings> settingsOptions, H
     }
     
     [HttpGet("health"), AllowAnonymous]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesDefaultResponseType]
     public Task<IActionResult> HealthCheck() => Task.FromResult<IActionResult>(Ok());
 }

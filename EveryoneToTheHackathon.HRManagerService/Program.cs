@@ -1,5 +1,6 @@
 using EveryoneToTheHackathon.Entities;
 using EveryoneToTheHackathon.HRManagerService;
+using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;

@@ -1,6 +1,7 @@
 using EveryoneToTheHackathon.Entities;
 using EveryoneToTheHackathon.HRDirectorService;
 using EveryoneToTheHackathon.Repositories;
+using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -32,6 +33,14 @@ builder.Services.AddDbContextFactory<AppDbContext>(options =>
 {
     options.UseNpgsql(connString);
     options.EnableDetailedErrors();
+});
+
+builder.Services.AddMassTransit(x =>
+{
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host(new Uri("amqp://rabbitmq:5672/"));
+    });
 });
 
 builder.Services.AddMvc();

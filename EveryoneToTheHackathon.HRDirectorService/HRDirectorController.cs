@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using EveryoneToTheHackathon.Dtos;
 using EveryoneToTheHackathon.Entities;
+using MassTransit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,10 +16,8 @@ public class HrDirectorController(IOptions<ControllerSettings> settingsOptions, 
 {
     private HrDirectorService HrDirectorService { get; } = hrDirectorService;
     private readonly ControllerSettings _settings = settingsOptions.Value;
-    
+
     [HttpPost("employees"), AllowAnonymous]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesDefaultResponseType]
     public Task<IActionResult> GetEmployees([FromBody] List<EmployeeDto> employeeDtos)
     {
         var employees = employeeDtos.
@@ -32,8 +31,6 @@ public class HrDirectorController(IOptions<ControllerSettings> settingsOptions, 
     }
 
     [HttpPost("wishlists"), AllowAnonymous]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesDefaultResponseType]
     public Task<IActionResult> GetWishlists([FromBody] List<WishlistDto> wishlistDtos)
     {
         var wishlists = wishlistDtos.
@@ -47,8 +44,6 @@ public class HrDirectorController(IOptions<ControllerSettings> settingsOptions, 
     }
     
     [HttpPost("teams"), AllowAnonymous]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesDefaultResponseType]
     public Task<IActionResult> GetTeams([FromBody] List<TeamDto> teamDtos)
     {
         var teams = teamDtos.
@@ -64,7 +59,5 @@ public class HrDirectorController(IOptions<ControllerSettings> settingsOptions, 
     }
     
     [HttpGet("health"), AllowAnonymous]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesDefaultResponseType]
     public Task<IActionResult> HealthCheck() => Task.FromResult<IActionResult>(Ok());
 }
