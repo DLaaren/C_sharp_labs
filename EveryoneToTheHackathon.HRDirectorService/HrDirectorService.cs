@@ -1,24 +1,32 @@
-using System.Diagnostics;
+using System.Collections.Concurrent;
 using EveryoneToTheHackathon.Entities;
 using EveryoneToTheHackathon.Repositories;
+using Microsoft.Extensions.Options;
 
 namespace EveryoneToTheHackathon.HRDirectorService;
 
-public class HrDirectorService(HRDirector hrDirector, IHackathonRepository hackathonRepository)
+public class HrDirectorService(IOptions<ServiceSettings> settings, HRDirector hrDirector, IHackathonRepository hackathonRepository)
 {
+    public readonly int EmployeesNumber = settings.Value.EmployeesNumber;
     private HRDirector HrDirector { get; } = hrDirector;
     private IHackathonRepository HackathonRepository { get; } = hackathonRepository;
 
-    public List<Employee>? Employees { get; set; }
-    public List<Wishlist>? Wishlists { get; set; }
-    public List<Team>? Teams { get; set; }
-
+    public ConcurrentBag<Employee> Employees { get; set; } = [];
+    //public List<Employee>? Employees { get; set; }
+    //public List<Wishlist>? Wishlists { get; set; }
+    public ConcurrentBag<Wishlist> Wishlists { get; set; } = [];
+    public List<Team> Teams { get; set; } = [];
+    
+    public readonly TaskCompletionSource<bool> EmployeesGotTcs = new();
+    public readonly TaskCompletionSource<bool> WishlistsGotTcs = new();
+    public readonly TaskCompletionSource<bool> TeamsGotTcs = new();
+    
     public double CalculationMeanSatisfactionIndex()
     {
-        var meanSatisfactionIndex = HrDirector.CalculateMeanSatisfactionIndex(
-            Wishlists!.Where(w => w.EmployeeTitle.Equals(EmployeeTitle.TeamLead)).ToList(),
-            Wishlists!.Where(w => w.EmployeeTitle.Equals(EmployeeTitle.Junior)).ToList(),
-            Teams!);
+        var teamleadsWishlists = Wishlists.Where(w => w.EmployeeTitle.Equals(EmployeeTitle.TeamLead)).ToList();
+        var juniorsWishlists = Wishlists.Where(w => w.EmployeeTitle.Equals(EmployeeTitle.Junior)).ToList();
+        // var teams = Teams.ToList();
+        var meanSatisfactionIndex = HrDirector.CalculateMeanSatisfactionIndex(teamleadsWishlists, juniorsWishlists, Teams);
         return meanSatisfactionIndex;
     }
     
@@ -26,12 +34,12 @@ public class HrDirectorService(HRDirector hrDirector, IHackathonRepository hacka
     {
         Hackathon hackathon = new Hackathon
         {
-            Employees = Employees
+            Employees = Employees.ToList()
         };
         HackathonRepository.AddHackathon(hackathon);
         
-        hackathon.Employees = Employees;
-        hackathon.Wishlists = Wishlists;
+        hackathon.Employees = Employees.ToList();
+        hackathon.Wishlists = Wishlists.ToList();
         hackathon.Teams = Teams;
         hackathon.MeanSatisfactionIndex = meanSatisfactionIndex;
         

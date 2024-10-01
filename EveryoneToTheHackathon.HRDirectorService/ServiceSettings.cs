@@ -1,6 +1,6 @@
 namespace EveryoneToTheHackathon.HRDirectorService;
 
-public class ControllerSettings
+public class ServiceSettings
 {
     public int EmployeesNumber { get; set; }
 }
