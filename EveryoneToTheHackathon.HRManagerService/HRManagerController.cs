@@ -11,29 +11,29 @@ namespace EveryoneToTheHackathon.HRManagerService;
 
 [ApiController]
 [Route("api/hr_manager")]
-public class HrManagerController(IOptions<ControllerSettings> settingsOptions, HrManagerService hrManagerService)
+public class HrManagerController(HrManagerService hrManagerService)
     : ControllerBase
 {
     private static readonly ConcurrentBag<EmployeeDto> EmployeeDtos = [];
     private static readonly ConcurrentBag<WishlistDto> WishlistDtos = [];
 
     private HrManagerService HrManagerService { get; } = hrManagerService;
-    private readonly ControllerSettings _settings = settingsOptions.Value;
+    
 
     [HttpPost("employee"), AllowAnonymous]
     public Task<IActionResult> GetEmployees([FromBody] EmployeeDto employeeDto)
     {
         EmployeeDtos.Add(employeeDto);
 
-        if (EmployeeDtos.Count < _settings.EmployeesNumber) return Task.FromResult<IActionResult>(Ok());
+        if (EmployeeDtos.Count < HrManagerService.EmployeesNumber) return Task.FromResult<IActionResult>(Ok());
         
         var employees = new List<EmployeeDto>(EmployeeDtos).
             Select(eDto => new Employee(eDto.Id, eDto.Title, eDto.Name)).ToList();
             
         EmployeeDtos.Clear();
 
-        HrManagerService.Employees = employees;
-        Debug.Assert(HrManagerService.Employees!.Count == _settings.EmployeesNumber);
+        HrManagerService.Employees = new ConcurrentBag<Employee>(employees);
+        Debug.Assert(HrManagerService.Employees.Count == HrManagerService.EmployeesNumber);
 
         return Task.FromResult<IActionResult>(Ok());
     }
@@ -43,15 +43,15 @@ public class HrManagerController(IOptions<ControllerSettings> settingsOptions, H
     {
         WishlistDtos.Add(wishlistDto);
 
-        if (WishlistDtos.Count < _settings.EmployeesNumber) return Task.FromResult<IActionResult>(Ok());
+        if (WishlistDtos.Count < HrManagerService.EmployeesNumber) return Task.FromResult<IActionResult>(Ok());
         
         var wishlists = new List<WishlistDto>(WishlistDtos).
             Select(wDto => new Wishlist(wDto.EmployeeId, wDto.EmployeeTitle, wDto.DesiredEmployees)).ToList();
             
         WishlistDtos.Clear();
 
-        HrManagerService.Wishlists = wishlists;
-        Debug.Assert(HrManagerService.Wishlists!.Count == _settings.EmployeesNumber);
+        HrManagerService.Wishlists = new ConcurrentBag<Wishlist>(wishlists);
+        Debug.Assert(HrManagerService.Wishlists.Count == HrManagerService.EmployeesNumber);
 
         return Task.FromResult<IActionResult>(Ok());
     }

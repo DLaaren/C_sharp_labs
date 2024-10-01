@@ -1,21 +1,18 @@
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using EveryoneToTheHackathon.Dtos;
 using EveryoneToTheHackathon.Entities;
-using MassTransit;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 
 namespace EveryoneToTheHackathon.HRDirectorService;
 
 [ApiController]
 [Route("api/hr_director")]
-public class HrDirectorController(IOptions<ControllerSettings> settingsOptions, HrDirectorService hrDirectorService)
+public class HrDirectorController(HrDirectorService hrDirectorService)
     : ControllerBase
 {
     private HrDirectorService HrDirectorService { get; } = hrDirectorService;
-    private readonly ControllerSettings _settings = settingsOptions.Value;
 
     [HttpPost("employees"), AllowAnonymous]
     public Task<IActionResult> GetEmployees([FromBody] List<EmployeeDto> employeeDtos)
@@ -23,9 +20,9 @@ public class HrDirectorController(IOptions<ControllerSettings> settingsOptions, 
         var employees = employeeDtos.
             Select(eDto => new Employee(eDto.Id, eDto.Title, eDto.Name)).ToList();
         
-        Debug.Assert(employees.Count == _settings.EmployeesNumber);
+        Debug.Assert(employees.Count == HrDirectorService.EmployeesNumber);
 
-        HrDirectorService.Employees = employees;
+        HrDirectorService.Employees = new ConcurrentBag<Employee>(employees);
         
         return Task.FromResult<IActionResult>(Ok());
     }
@@ -36,9 +33,9 @@ public class HrDirectorController(IOptions<ControllerSettings> settingsOptions, 
         var wishlists = wishlistDtos.
             Select(wDto => new Wishlist(wDto.EmployeeId, wDto.EmployeeTitle, wDto.DesiredEmployees)).ToList();
 
-        Debug.Assert(wishlists.Count == _settings.EmployeesNumber);
+        Debug.Assert(wishlists.Count == HrDirectorService.EmployeesNumber);
         
-        HrDirectorService.Wishlists = wishlists;
+        HrDirectorService.Wishlists = new ConcurrentBag<Wishlist>(wishlists);
         
         return Task.FromResult<IActionResult>(Ok());
     }
@@ -51,9 +48,10 @@ public class HrDirectorController(IOptions<ControllerSettings> settingsOptions, 
                 new Employee(tDto.TeamLead.Id, tDto.TeamLead.Title, tDto.TeamLead.Name), 
                 new Employee(tDto.Junior.Id, tDto.Junior.Title, tDto.Junior.Name))).ToList();
 
-        Debug.Assert(teams.Count == _settings.EmployeesNumber / 2);
+        Debug.Assert(teams.Count == HrDirectorService.EmployeesNumber / 2);
         
         HrDirectorService.Teams = teams;
+        HrDirectorService.TeamsGotTcs.SetResult(true);
         
         return Task.FromResult<IActionResult>(Ok());
     }

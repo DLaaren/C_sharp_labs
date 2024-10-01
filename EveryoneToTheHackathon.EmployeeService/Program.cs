@@ -49,6 +49,7 @@ builder.Services.Configure<ServiceSettings>(settings =>
 builder.Services.AddSingleton<EmployeeService>(e => new EmployeeService(e.GetService<IOptions<ServiceSettings>>()!));
 builder.Services.AddHostedService<EmployeeBackgroundService>(e => 
     new EmployeeBackgroundService(
+        e.GetRequiredService<IBusControl>(),
         e.GetRequiredService<ILogger<EmployeeBackgroundService>>(),
         e.GetRequiredService<IHttpClientFactory>().CreateClient(nameof(EmployeeBackgroundService)),
         e.GetRequiredService<EmployeeService>()));

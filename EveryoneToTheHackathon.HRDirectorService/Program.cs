@@ -37,9 +37,11 @@ builder.Services.AddDbContextFactory<AppDbContext>(options =>
 
 builder.Services.AddMassTransit(x =>
 {
+    x.AddConsumer<HrDirectorBackgroundService>();
     x.UsingRabbitMq((context, cfg) =>
     {
         cfg.Host(new Uri("amqp://rabbitmq:5672/"));
+        cfg.ReceiveEndpoint($"HRDirector", e => e.ConfigureConsumers(context));
     });
 });
 
@@ -48,7 +50,7 @@ builder.Services.AddSingleton<HRDirector>();
 builder.Services.AddSingleton<IHackathonRepository, HackathonRepository>();
 
 builder.Services.AddOptions();
-builder.Services.Configure<ControllerSettings>(settings => settings.EmployeesNumber = employeesNumber);
+builder.Services.Configure<ServiceSettings>(settings => settings.EmployeesNumber = employeesNumber);
 builder.Services.AddSingleton<HrDirectorService>();
 
 builder.Services.AddHostedService<HrDirectorBackgroundService>();
