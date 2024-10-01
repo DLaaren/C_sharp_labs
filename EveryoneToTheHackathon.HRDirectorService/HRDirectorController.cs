@@ -50,7 +50,7 @@ public class HrDirectorController(HrDirectorService hrDirectorService)
 
         Debug.Assert(teams.Count == HrDirectorService.EmployeesNumber / 2);
         
-        HrDirectorService.Teams = teams;
+        HrDirectorService.Teams = new ConcurrentBag<Team>(teams);
         HrDirectorService.TeamsGotTcs.SetResult(true);
         
         return Task.FromResult<IActionResult>(Ok());

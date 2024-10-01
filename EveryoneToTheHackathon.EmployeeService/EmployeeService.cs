@@ -7,5 +7,10 @@ public class EmployeeService(IOptions<ServiceSettings> settings)
 {
     public Employee Employee { get; } = settings.Value.Employee;
     public IEnumerable<Employee> ProbableTeammates { get; } = settings.Value.ProbableTeammates;
-    public readonly TaskCompletionSource<bool> HackathonStartedTcs = new();
+    public TaskCompletionSource<bool> HackathonStartedTcs = new();
+
+    public void ResetAll()
+    {
+        HackathonStartedTcs = new TaskCompletionSource<bool>();
+    }
 } 

@@ -16,51 +16,43 @@ public class HrManagerBackgroundService(
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        logger.LogInformation("Waiting for a hackathon to start");
-        await hrManagerService.HackathonStartedTcs.Task;
-        
-        logger.LogInformation("HRManager waiting for employees;");
-        
-        await hrManagerService.EmployeesGotTcs.Task;
-        // while (hrManagerService.Employees == null)
-        //     await Task.Delay(1000, stoppingToken);
-        //
-        // await SendEmployeesAsync(hrManagerService.Employees!, stoppingToken);
-        // logger.LogInformation("HRManager has sent employees;");
-        
-        logger.LogInformation("HRManager waiting for wishlists;");
-        
-        await hrManagerService.WishlistsGotTcs.Task;
-        // while (hrManagerService.Wishlists == null)
-        //     await Task.Delay(1000, stoppingToken);
-        //
-        // await SendWishlistsAsync(hrManagerService.Wishlists!, stoppingToken);
-        // logger.LogInformation("HRManager has sent wishlists;");
+        while (true)
+        {
+            hrManagerService.HackathonStartedTcs = new TaskCompletionSource<bool>();
 
-        Debug.Assert(hrManagerService.Employees != null);
-        Debug.Assert(hrManagerService.Wishlists != null);
+            logger.LogInformation("Waiting for a hackathon to start");
+            await hrManagerService.HackathonStartedTcs.Task;
+            
+            hrManagerService.ResetAll();
 
-        var teamleads = hrManagerService.Employees.Where(e => e.Title.Equals(EmployeeTitle.TeamLead)).ToList();
-        var juniors = hrManagerService.Employees.Where(e => e.Title.Equals(EmployeeTitle.Junior)).ToList();
-        var teamleadsWishlists = hrManagerService.Wishlists.Where(w => w.EmployeeTitle.Equals(EmployeeTitle.TeamLead)).ToList();
-        var juniorsWishlists = hrManagerService.Wishlists.Where(w => w.EmployeeTitle.Equals(EmployeeTitle.Junior)).ToList();
+            logger.LogInformation("HRManager waiting for employees;");
+            await hrManagerService.EmployeesGotTcs.Task;
 
-        // foreach (var w in teamleadsWishlists)
-        //     Console.WriteLine(w.DesiredEmployees[0] + " " + w.DesiredEmployees[1] + " " + w.DesiredEmployees[2] + " " + w.DesiredEmployees[3] + " " + w.DesiredEmployees[4]);
-        // Console.WriteLine();
-        
-        
-        Debug.Assert(teamleads != null && teamleads.Count == hrManagerService.Employees.Count / 2);
-        Debug.Assert(juniors != null && juniors.Count == hrManagerService.Employees.Count / 2);
-        Debug.Assert(teamleadsWishlists != null && teamleadsWishlists.Count == hrManagerService.Employees.Count / 2);
-        Debug.Assert(juniorsWishlists != null && juniorsWishlists.Count == hrManagerService.Employees.Count / 2);
-        
-        var teams = hrManagerService.HrManager.BuildTeams(teamleads, juniors, teamleadsWishlists, juniorsWishlists);
-        logger.LogInformation("HRManager has created teams;");
+            logger.LogInformation("HRManager waiting for wishlists;");
+            await hrManagerService.WishlistsGotTcs.Task;
 
-        await SendTeamsAsync(teams, stoppingToken);
-        logger.LogInformation("HRManager has sent teams;");
+            Debug.Assert(hrManagerService.Employees != null);
+            Debug.Assert(hrManagerService.Wishlists != null);
 
+            var teamleads = hrManagerService.Employees.Where(e => e.Title.Equals(EmployeeTitle.TeamLead)).ToList();
+            var juniors = hrManagerService.Employees.Where(e => e.Title.Equals(EmployeeTitle.Junior)).ToList();
+            var teamleadsWishlists = hrManagerService.Wishlists
+                .Where(w => w.EmployeeTitle.Equals(EmployeeTitle.TeamLead)).ToList();
+            var juniorsWishlists = hrManagerService.Wishlists.Where(w => w.EmployeeTitle.Equals(EmployeeTitle.Junior))
+                .ToList();
+
+            Debug.Assert(teamleads != null && teamleads.Count == hrManagerService.Employees.Count / 2);
+            Debug.Assert(juniors != null && juniors.Count == hrManagerService.Employees.Count / 2);
+            Debug.Assert(teamleadsWishlists != null &&
+                         teamleadsWishlists.Count == hrManagerService.Employees.Count / 2);
+            Debug.Assert(juniorsWishlists != null && juniorsWishlists.Count == hrManagerService.Employees.Count / 2);
+
+            var teams = hrManagerService.HrManager.BuildTeams(teamleads, juniors, teamleadsWishlists, juniorsWishlists);
+            logger.LogInformation("HRManager has created teams;");
+
+            await SendTeamsAsync(teams, stoppingToken);
+            logger.LogInformation("HRManager has sent teams;");
+        }
         await Task.CompletedTask;
     }
     
@@ -99,7 +91,7 @@ public class HrManagerBackgroundService(
         public Task Consume(ConsumeContext<HackathonStarted> context)
        {
            logger.LogInformation(context.Message.Message);
-           hrManagerService.HackathonStartedTcs.SetResult(true);
+           hrManagerService.HackathonStartedTcs.TrySetResult(true);
            return Task.CompletedTask;
        }
         
@@ -107,7 +99,7 @@ public class HrManagerBackgroundService(
        {
            hrManagerService.Employees.Add(new Employee(context.Message.Id, context.Message.Title, context.Message.Name));
            if (hrManagerService.Employees.Count >= hrManagerService.EmployeesNumber)
-               hrManagerService.EmployeesGotTcs.SetResult(true);
+               hrManagerService.EmployeesGotTcs.TrySetResult(true);
            return Task.CompletedTask;
        }
 
@@ -115,7 +107,7 @@ public class HrManagerBackgroundService(
        {
            hrManagerService.Wishlists.Add(new Wishlist(context.Message.EmployeeId, context.Message.EmployeeTitle, context.Message.DesiredEmployees));
            if (hrManagerService.Wishlists.Count >= hrManagerService.EmployeesNumber)
-               hrManagerService.WishlistsGotTcs.SetResult(true);
+               hrManagerService.WishlistsGotTcs.TrySetResult(true);
            return Task.CompletedTask;
        }
 }

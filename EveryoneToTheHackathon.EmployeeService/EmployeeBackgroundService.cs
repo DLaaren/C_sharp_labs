@@ -16,23 +16,32 @@ public class EmployeeBackgroundService(
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        logger.LogInformation("Waiting for a hackathon to start");
-        await employeeService.HackathonStartedTcs.Task;
+        while (true)
+        {
+            employeeService.HackathonStartedTcs = new TaskCompletionSource<bool>();
+            
+            logger.LogInformation("Waiting for a hackathon to start");
+            await employeeService.HackathonStartedTcs.Task;
+            
+            employeeService.ResetAll();
 
-        //await SendEmployeeAsync(employeeService.Employee, stoppingToken);
-        await SendEmployeeAsyncViaMessage(employeeService.Employee, stoppingToken);
-        logger.LogInformation("Employee 'Id = {Id} Title = {Title} Name = {Name}' has sent his data;",
-            employeeService.Employee.Id, employeeService.Employee.Title, employeeService.Employee.Name);
+            //await SendEmployeeAsync(employeeService.Employee, stoppingToken);
+            await SendEmployeeAsyncViaMessage(employeeService.Employee, stoppingToken);
+            logger.LogInformation("Employee 'Id = {Id} Title = {Title} Name = {Name}' has sent his data;",
+                employeeService.Employee.Id, employeeService.Employee.Title, employeeService.Employee.Name);
 
-        logger.LogInformation("Employee 'Id = {Id} Title = {Title} Name = {Name}' is making his wishlist;",
-            employeeService.Employee.Id, employeeService.Employee.Title, employeeService.Employee.Name);
-        var wishlist = employeeService.Employee.MakeWishlist(employeeService.ProbableTeammates);
-        
-        //await SendWishlistAsync(wishlist, stoppingToken);
-        await SendWishlistAsyncViaMessage(wishlist, stoppingToken);
-        logger.LogInformation("Employee 'Id = {Id} Title = {Title} Name = {Name}' has sent his wishlist: {Wishlist};",
-            employeeService.Employee.Id, employeeService.Employee.Title, employeeService.Employee.Name, wishlist.DesiredEmployees);
-        
+            logger.LogInformation("Employee 'Id = {Id} Title = {Title} Name = {Name}' is making his wishlist;",
+                employeeService.Employee.Id, employeeService.Employee.Title, employeeService.Employee.Name);
+            var wishlist = employeeService.Employee.MakeWishlist(employeeService.ProbableTeammates);
+
+            //await SendWishlistAsync(wishlist, stoppingToken);
+            await SendWishlistAsyncViaMessage(wishlist, stoppingToken);
+            logger.LogInformation(
+                "Employee 'Id = {Id} Title = {Title} Name = {Name}' has sent his wishlist: {Wishlist};",
+                employeeService.Employee.Id, employeeService.Employee.Title, employeeService.Employee.Name,
+                wishlist.DesiredEmployees);
+        }
+
         await Task.CompletedTask;
     }
 
@@ -72,7 +81,7 @@ public class EmployeeBackgroundService(
     public Task Consume(ConsumeContext<HackathonStarted> context)
     {
         logger.LogInformation(context.Message.Message);
-        employeeService.HackathonStartedTcs.SetResult(true);
+        employeeService.HackathonStartedTcs.TrySetResult(true);
         return Task.CompletedTask;
     }
 }
