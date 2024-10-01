@@ -14,7 +14,17 @@ public class HrManagerService(IOptions<ControllerSettings> settings, HRManager h
     public ConcurrentBag<Employee> Employees { get; set; } = [];
     public ConcurrentBag<Wishlist> Wishlists { get; set; } = [];
 
-    public readonly TaskCompletionSource<bool> HackathonStartedTcs = new();
-    public readonly TaskCompletionSource<bool> EmployeesGotTcs = new();
-    public readonly TaskCompletionSource<bool> WishlistsGotTcs = new();
+    public TaskCompletionSource<bool> HackathonStartedTcs = new();
+    public TaskCompletionSource<bool> EmployeesGotTcs = new();
+    public TaskCompletionSource<bool> WishlistsGotTcs = new();
+
+    public void ResetAll()
+    {
+        HackathonStartedTcs = new TaskCompletionSource<bool>();
+        EmployeesGotTcs = new TaskCompletionSource<bool>();
+        WishlistsGotTcs = new TaskCompletionSource<bool>();
+        
+        Employees.Clear();
+        Wishlists.Clear();
+    }
 }

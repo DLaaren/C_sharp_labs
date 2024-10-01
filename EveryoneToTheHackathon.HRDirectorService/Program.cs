@@ -18,6 +18,7 @@ builder.WebHost.ConfigureKestrel(options =>
 });
 
 var employeesNumber = builder.Configuration.GetValue<int>("EMPLOYEES_NUM");
+var hackathonsNumber = builder.Configuration.GetValue<int>("HACKATHONS_NUM");
 
 var connString =
     String.Format(
@@ -41,7 +42,12 @@ builder.Services.AddMassTransit(x =>
     x.UsingRabbitMq((context, cfg) =>
     {
         cfg.Host(new Uri("amqp://rabbitmq:5672/"));
-        cfg.ReceiveEndpoint($"HRDirector", e => e.ConfigureConsumers(context));
+        cfg.ReceiveEndpoint($"HRDirector", e =>
+            {
+                e.ConfigureConsumers(context);
+                e.UseMessageRetry(r => r.Interval(5, TimeSpan.FromSeconds(10)));
+            }
+        );
     });
 });
 
@@ -50,7 +56,11 @@ builder.Services.AddSingleton<HRDirector>();
 builder.Services.AddSingleton<IHackathonRepository, HackathonRepository>();
 
 builder.Services.AddOptions();
-builder.Services.Configure<ServiceSettings>(settings => settings.EmployeesNumber = employeesNumber);
+builder.Services.Configure<ServiceSettings>(settings =>
+{
+    settings.EmployeesNumber = employeesNumber;
+    settings.HackathonsNumber = hackathonsNumber;
+});
 builder.Services.AddSingleton<HrDirectorService>();
 
 builder.Services.AddHostedService<HrDirectorBackgroundService>();

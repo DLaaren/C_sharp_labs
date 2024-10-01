@@ -12,40 +12,42 @@ public class HrDirectorBackgroundService(
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await AnnounceHackathon(stoppingToken);
-        logger.LogInformation("HRDirector has announced start of the hackathon");
-        
-        logger.LogInformation("HRDirector waiting for employees, wishlists, teams;");
+        for (var i = 0; i < hrDirectorService.HackathonsNumber; i++)//, await Task.Delay(1000, stoppingToken))
+        {
+            await AnnounceHackathon(stoppingToken);
+            logger.LogInformation("HRDirector has announced start of the hackathon");
 
-        await hrDirectorService.EmployeesGotTcs.Task;
-        await hrDirectorService.WishlistsGotTcs.Task;
-        await hrDirectorService.TeamsGotTcs.Task;
-        
-        // while (hrDirectorService.Employees == null || hrDirectorService.Wishlists == null || hrDirectorService.Teams == null)
-        //     await Task.Delay(1000, stoppingToken);
+            logger.LogInformation("HRDirector waiting for employees, wishlists, teams;");
 
-        logger.LogInformation("HRDirector got all data;");
-        
-        var meanSatisfactionIndex = hrDirectorService.CalculationMeanSatisfactionIndex();
+            await hrDirectorService.EmployeesGotTcs.Task;
+            logger.LogInformation("HRDirector got all employees;");
+            await hrDirectorService.WishlistsGotTcs.Task;
+            logger.LogInformation("HRDirector got all wishlists;");
+            await hrDirectorService.TeamsGotTcs.Task;
+            logger.LogInformation("HRDirector got all teams;");
 
-        hrDirectorService.SaveHackathon(meanSatisfactionIndex);
-        logger.LogInformation("HRDirector has stored all information to database;");
-        
-        logger.LogInformation("HRDirector has counted mean satisfaction index: {index}", meanSatisfactionIndex);
-        
+            var meanSatisfactionIndex = hrDirectorService.CalculationMeanSatisfactionIndex();
+
+            hrDirectorService.SaveHackathon(meanSatisfactionIndex);
+            logger.LogInformation("HRDirector has stored all information to database;");
+
+            logger.LogInformation("HRDirector has counted mean satisfaction index: {index}", meanSatisfactionIndex);
+        }
+
         await Task.CompletedTask;
     }
 
     private async Task AnnounceHackathon(CancellationToken stoppingToken)
     {
-        await busControl.Publish<HackathonStarted>(new HackathonStarted("Hackathon has started"), stoppingToken);
+        await hrDirectorService.ResetAll();
+        await busControl.Publish(new HackathonStarted("Hackathon has started"), stoppingToken);
     }
 
     public Task Consume(ConsumeContext<EmployeeSent> context)
     {
         hrDirectorService.Employees.Add(new Employee(context.Message.Id, context.Message.Title, context.Message.Name));
         if (hrDirectorService.Employees.Count == hrDirectorService.EmployeesNumber)
-            hrDirectorService.EmployeesGotTcs.SetResult(true);
+            hrDirectorService.EmployeesGotTcs.TrySetResult(true);
         return Task.CompletedTask;
     }
 
@@ -53,7 +55,7 @@ public class HrDirectorBackgroundService(
     {
         hrDirectorService.Wishlists.Add(new Wishlist(context.Message.EmployeeId, context.Message.EmployeeTitle, context.Message.DesiredEmployees));
         if (hrDirectorService.Wishlists.Count == hrDirectorService.EmployeesNumber)
-            hrDirectorService.WishlistsGotTcs.SetResult(true);
+            hrDirectorService.WishlistsGotTcs.TrySetResult(true);
         return Task.CompletedTask;
     }
 }

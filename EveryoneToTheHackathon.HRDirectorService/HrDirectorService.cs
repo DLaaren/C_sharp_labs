@@ -8,25 +8,35 @@ namespace EveryoneToTheHackathon.HRDirectorService;
 public class HrDirectorService(IOptions<ServiceSettings> settings, HRDirector hrDirector, IHackathonRepository hackathonRepository)
 {
     public readonly int EmployeesNumber = settings.Value.EmployeesNumber;
+    public readonly int HackathonsNumber = settings.Value.HackathonsNumber;
     private HRDirector HrDirector { get; } = hrDirector;
     private IHackathonRepository HackathonRepository { get; } = hackathonRepository;
 
     public ConcurrentBag<Employee> Employees { get; set; } = [];
-    //public List<Employee>? Employees { get; set; }
-    //public List<Wishlist>? Wishlists { get; set; }
     public ConcurrentBag<Wishlist> Wishlists { get; set; } = [];
-    public List<Team> Teams { get; set; } = [];
-    
-    public readonly TaskCompletionSource<bool> EmployeesGotTcs = new();
-    public readonly TaskCompletionSource<bool> WishlistsGotTcs = new();
-    public readonly TaskCompletionSource<bool> TeamsGotTcs = new();
+    public ConcurrentBag<Team> Teams { get; set; } = [];
+
+    public TaskCompletionSource<bool> EmployeesGotTcs = new();
+    public TaskCompletionSource<bool> WishlistsGotTcs = new();
+    public TaskCompletionSource<bool> TeamsGotTcs = new();
+
+    public async Task ResetAll()
+    {
+        await Task.Delay(1500);
+        EmployeesGotTcs = new TaskCompletionSource<bool>();
+        WishlistsGotTcs = new TaskCompletionSource<bool>();
+        TeamsGotTcs = new TaskCompletionSource<bool>();
+        Employees.Clear();
+        Wishlists.Clear();
+        Teams.Clear();
+    }
     
     public double CalculationMeanSatisfactionIndex()
     {
         var teamleadsWishlists = Wishlists.Where(w => w.EmployeeTitle.Equals(EmployeeTitle.TeamLead)).ToList();
         var juniorsWishlists = Wishlists.Where(w => w.EmployeeTitle.Equals(EmployeeTitle.Junior)).ToList();
-        // var teams = Teams.ToList();
-        var meanSatisfactionIndex = HrDirector.CalculateMeanSatisfactionIndex(teamleadsWishlists, juniorsWishlists, Teams);
+        var teams = Teams.ToList();
+        var meanSatisfactionIndex = HrDirector.CalculateMeanSatisfactionIndex(teamleadsWishlists, juniorsWishlists, teams);
         return meanSatisfactionIndex;
     }
     
@@ -40,7 +50,7 @@ public class HrDirectorService(IOptions<ServiceSettings> settings, HRDirector hr
         
         hackathon.Employees = Employees.ToList();
         hackathon.Wishlists = Wishlists.ToList();
-        hackathon.Teams = Teams;
+        hackathon.Teams = Teams.ToList();
         hackathon.MeanSatisfactionIndex = meanSatisfactionIndex;
         
         ((List<Team>)hackathon.Teams!).ForEach(t =>
