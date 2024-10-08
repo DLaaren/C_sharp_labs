@@ -4,23 +4,33 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EveryoneToTheHackathon.Tests;
 
+public class InMemoryDbContextFactory : IDbContextFactory<AppDbContext>
+{
+    private readonly DbContextOptions<AppDbContext> _options = new DbContextOptionsBuilder<AppDbContext>()
+        .UseInMemoryDatabase(databaseName: "TestDatabase")
+        .Options;
+
+    public AppDbContext CreateDbContext()
+    {
+        return new AppDbContext(_options, false);
+    }
+}
+
 public class DatabaseTests(DatabaseFixture fixture) : IClassFixture<DatabaseFixture>
 {
-    private static AppDbContext GetInMemoryDbContext()
+    private static IDbContextFactory<AppDbContext> GetInMemoryDbContext()
     {
-        var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseInMemoryDatabase(databaseName: "TestDatabase")
-            .Options;
+        InMemoryDbContextFactory dbContextFactory = new InMemoryDbContextFactory();
 
-        return new AppDbContext(options);
+        return dbContextFactory;
     }
     
     [Fact]
     private void TestingDatabase()
     {
         // Arrange
-        var dbContext = GetInMemoryDbContext();
-        var hackathonService = new HackathonRepository(dbContext);
+        var hackathonService = new HackathonRepository(GetInMemoryDbContext());
+        var dbContext = (AppDbContext) typeof(HackathonRepository).GetField("_dbContext", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.GetValue(hackathonService)!;
         var hackathon = new Hackathon(
             fixture.TeamLeads, 
             fixture.Juniors, 
@@ -47,9 +57,9 @@ public class DatabaseTests(DatabaseFixture fixture) : IClassFixture<DatabaseFixt
         Assert.NotNull(hackathonResult);
         Assert.True(hackathonResult.Id > 0);
         Assert.Equal(4.2, hackathonResult.MeanSatisfactionIndex);
-        Assert.Equal(hackathon.Employees, hackathonResult.Employees!);
-        Assert.Equal(hackathon.Wishlists, hackathonResult.Wishlists!);
-        Assert.Equal(hackathon.Teams, hackathonResult.Teams!);
+        Assert.Equal(hackathon.Employees, hackathonResult.Employees);
+        Assert.Equal(hackathon.Wishlists, hackathonResult.Wishlists);
+        Assert.Equal(hackathon.Teams, hackathonResult.Teams);
         
         // Clean up
         hackathonService.DeleteHackathon(hackathon.Id);
@@ -60,8 +70,8 @@ public class DatabaseTests(DatabaseFixture fixture) : IClassFixture<DatabaseFixt
     private void ReadingAndWritingMeanSatisfactionIndexFromDatabase()
     {
         // Arrange
-        var dbContext = GetInMemoryDbContext();
-        var hackathonService = new HackathonRepository(dbContext);
+        var hackathonService = new HackathonRepository(GetInMemoryDbContext());
+        var dbContext = (AppDbContext) typeof(HackathonRepository).GetField("_dbContext", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.GetValue(hackathonService)!;
         var hackathon1 = new Hackathon
         {
             Id = 2,

@@ -24,6 +24,10 @@
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0-rc.1.24451.1">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
       <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.0-rc.1.24431.7" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0-rc.1.24431.7" />
       <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0-rc.1.24431.7" />
@@ -33,6 +37,12 @@
     <ItemGroup>
       <ProjectReference Include="..\EveryoneToTheHackathon.Entities\EveryoneToTheHackathon.Entities.csproj" />
       <ProjectReference Include="..\EveryoneToTheHackathon.Repositories\EveryoneToTheHackathon.Repositories.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Microsoft.VisualStudio.TestPlatform.ObjectModel">
+        <HintPath>..\..\..\.nuget\packages\microsoft.testplatform.testhost\17.11.1\lib\netcoreapp3.1\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>

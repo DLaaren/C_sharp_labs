@@ -1,42 +1,20 @@
 using EveryoneToTheHackathon.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace EveryoneToTheHackathon.Repositories;
 
-public class EmployeeRepository(AppDbContext dbContext) : IEmployeeRepository
+public class EmployeeRepository(IDbContextFactory<AppDbContext> myDbContextFactory) : IEmployeeRepository
 {
-    private readonly AppDbContext _dbContext = dbContext;
-
-    public Employee? GetEmployeeById(int employeeId)
-    {
-        return _dbContext.Employees.Find(employeeId);
-    }
+    private readonly AppDbContext _dbContext = myDbContextFactory.CreateDbContext();
     
-    public IEnumerable<Employee> GetEmployees()
-    {
-        return _dbContext.Employees.ToList();
-    }
-
     public void AddEmployee(Employee employee)
     {
         _dbContext.Add(employee);
         _dbContext.SaveChanges();
     }
-    
-    public void AddEmployees(IEnumerable<Employee> employees)
+
+    public IEnumerable<Employee> GetEmployeeByHackathonId(int hackathonId)
     {
-        _dbContext.AddRange(employees);
-        _dbContext.SaveChanges();
-    }
-    
-    public void UpdateEmployee(Employee employee)
-    {
-        _dbContext.Update(employee);
-        _dbContext.SaveChanges();
-    }
-    
-    public void UpdateEmployees(IEnumerable<Employee> employees)
-    {
-        _dbContext.UpdateRange(employees);
-        _dbContext.SaveChanges();
+        return _dbContext.Employees.Where(e => e.Hackathons.Select(h => h.Id).Contains(hackathonId)).ToList();
     }
 }

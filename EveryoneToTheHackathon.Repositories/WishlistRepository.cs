@@ -1,44 +1,20 @@
 using EveryoneToTheHackathon.Entities;
-using EveryoneToTheHackathon.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace EveryoneToTheHackathon.Repositories;
 
-public class WishlistRepository(AppDbContext dbContext) : IWishlistRepository
+public class WishlistRepository(IDbContextFactory<AppDbContext> myDbContextFactory) : IWishlistRepository
 {
-    private readonly AppDbContext _dbContext = dbContext;
-
-    public Wishlist? GetWishlistById(int wishlistId)
-    {
-        return _dbContext.Wishlists.Find(wishlistId);
-    }
+    private readonly AppDbContext _dbContext = myDbContextFactory.CreateDbContext();
     
-    public IEnumerable<Wishlist> GetWishlists()
-    {
-        return _dbContext.Wishlists.ToList();
-    }
-
     public void AddWishlist(Wishlist wishlist)
     {
         _dbContext.Add(wishlist);
         _dbContext.SaveChanges();
     }
     
-    public void AddWishlists(IEnumerable<Wishlist> wishlists)
+    public IEnumerable<Wishlist> GetWishlistByHackathonId(int hackathonId)
     {
-        _dbContext.AddRange(wishlists);
-        _dbContext.SaveChanges();
-    }
-    
-    public void UpdateWishlist(Wishlist wishlist)
-    {
-        _dbContext.Update(wishlist);
-        _dbContext.SaveChanges();
-    }
-    
-    public void UpdateWishlists(IEnumerable<Wishlist> wishlists)
-    {
-        _dbContext.UpdateRange(wishlists);
-        _dbContext.SaveChanges();
+        return _dbContext.Wishlists.Where(w => w.Hackathon != null && w.Hackathon.Id == hackathonId).ToList();
     }
 }

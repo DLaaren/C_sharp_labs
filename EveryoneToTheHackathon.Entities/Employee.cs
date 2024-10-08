@@ -16,9 +16,9 @@ public class Employee
     /* Public properties for database */
     
     /* Navigation properties */
-    public IEnumerable<Wishlist>?  Wishlists { get; set; }
-    public IEnumerable<Team>? Teams { get; set; }
-    public IEnumerable<Hackathon>? Hackathons { get; set; }
+    public IEnumerable<Wishlist>  Wishlists { get; set; }
+    public IEnumerable<Team> Teams { get; set; }
+    public IEnumerable<Hackathon> Hackathons { get; set; }
     /* Navigation properties */
     
     public Employee() {}
@@ -28,7 +28,9 @@ public class Employee
         Id = id;
         Title = title;
         Name = name;
+        Wishlists = new List<Wishlist>();
         Teams = new List<Team>();
+        Hackathons = new List<Hackathon>();
     }
     
     public Wishlist MakeWishlist(IEnumerable<Employee> employees)

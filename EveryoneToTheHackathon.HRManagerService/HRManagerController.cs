@@ -1,11 +1,8 @@
 using System.Collections.Concurrent;
-using System.Diagnostics;
 using EveryoneToTheHackathon.Dtos;
 using EveryoneToTheHackathon.Entities;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 
 namespace EveryoneToTheHackathon.HRManagerService;
 
@@ -18,10 +15,9 @@ public class HrManagerController(HrManagerService hrManagerService)
     private static readonly ConcurrentBag<WishlistDto> WishlistDtos = [];
 
     private HrManagerService HrManagerService { get; } = hrManagerService;
-    
 
     [HttpPost("employee"), AllowAnonymous]
-    public Task<IActionResult> GetEmployees([FromBody] EmployeeDto employeeDto)
+    public Task<IActionResult> PostEmployees([FromBody] EmployeeDto employeeDto)
     {
         EmployeeDtos.Add(employeeDto);
 
@@ -32,14 +28,14 @@ public class HrManagerController(HrManagerService hrManagerService)
             
         EmployeeDtos.Clear();
 
-        HrManagerService.Employees = new ConcurrentBag<Employee>(employees);
-        Debug.Assert(HrManagerService.Employees.Count == HrManagerService.EmployeesNumber);
+        // HrManagerService.Employees = new ConcurrentBag<Employee>(employees);
+        // Debug.Assert(HrManagerService.Employees.Count == HrManagerService.EmployeesNumber);
 
         return Task.FromResult<IActionResult>(Ok());
     }
     
     [HttpPost("wishlist"), AllowAnonymous]
-    public Task<IActionResult> GetWishlists([FromBody] WishlistDto wishlistDto)
+    public Task<IActionResult> PostWishlists([FromBody] WishlistDto wishlistDto)
     {
         WishlistDtos.Add(wishlistDto);
 
@@ -50,8 +46,8 @@ public class HrManagerController(HrManagerService hrManagerService)
             
         WishlistDtos.Clear();
 
-        HrManagerService.Wishlists = new ConcurrentBag<Wishlist>(wishlists);
-        Debug.Assert(HrManagerService.Wishlists.Count == HrManagerService.EmployeesNumber);
+        // HrManagerService.Wishlists = new ConcurrentBag<Wishlist>(wishlists);
+        // Debug.Assert(HrManagerService.Wishlists.Count == HrManagerService.EmployeesNumber);
 
         return Task.FromResult<IActionResult>(Ok());
     }

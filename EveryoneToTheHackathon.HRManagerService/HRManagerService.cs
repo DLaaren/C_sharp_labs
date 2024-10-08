@@ -1,30 +1,45 @@
-using System.Collections.Concurrent;
+using System.Diagnostics;
+using AutoMapper.Internal;
 using EveryoneToTheHackathon.Entities;
+using EveryoneToTheHackathon.Repositories;
 using Microsoft.Extensions.Options;
 
 namespace EveryoneToTheHackathon.HRManagerService;
 
-public class HrManagerService(IOptions<ControllerSettings> settings, HRManager hrManager)
+public class HrManagerService(
+    IOptions<ControllerSettings> settings, 
+    HRManager hrManager, 
+    IHackathonRepository hackathonRepository, 
+    IEmployeeRepository employeeRepository, 
+    IWishlistRepository wishlistRepository,
+    ITeamRepository teamRepository)
 {
     public readonly int EmployeesNumber = settings.Value.EmployeesNumber;
-    public HRManager HrManager { get; } = hrManager;
+    private HRManager HrManager { get; } = hrManager;
+    private IHackathonRepository HackathonRepository { get; } = hackathonRepository;
+    private IEmployeeRepository EmployeeRepository { get; } = employeeRepository;
+    private IWishlistRepository WishlistRepository { get; } = wishlistRepository;
+    private ITeamRepository TeamRepository { get; } = teamRepository;
 
-    //public List<Employee>? Employees { get; set; }
-    //public List<Wishlist>? Wishlists { get; set; }
-    public ConcurrentBag<Employee> Employees { get; set; } = [];
-    public ConcurrentBag<Wishlist> Wishlists { get; set; } = [];
-
-    public TaskCompletionSource<bool> HackathonStartedTcs = new();
-    public TaskCompletionSource<bool> EmployeesGotTcs = new();
-    public TaskCompletionSource<bool> WishlistsGotTcs = new();
-
-    public void ResetAll()
+    public void BuildTeamsAndSave(int hackathonId)
     {
-        HackathonStartedTcs = new TaskCompletionSource<bool>();
-        EmployeesGotTcs = new TaskCompletionSource<bool>();
-        WishlistsGotTcs = new TaskCompletionSource<bool>();
+        var hackathon = HackathonRepository.GetHackathonById(hackathonId);
+        Debug.Assert(hackathon != null);
+
+        var employees = (List<Employee>) EmployeeRepository.GetEmployeeByHackathonId(hackathonId);
+        var wishlists = (List<Wishlist>) WishlistRepository.GetWishlistByHackathonId(hackathonId);
+        var teamLeads = employees.Where(e => e.Title == EmployeeTitle.TeamLead).ToList();
+        var juniors = employees.Where(e => e.Title == EmployeeTitle.Junior).ToList();
+        var teamLeadsWishlists = wishlists.Where(w => w.EmployeeTitle == EmployeeTitle.TeamLead).ToList();
+        var juniorsWishlists = wishlists.Where(w => w.EmployeeTitle == EmployeeTitle.Junior).ToList();
         
-        Employees.Clear();
-        Wishlists.Clear();
+        var teams = (List<Team>)HrManager.BuildTeams(teamLeads, juniors, teamLeadsWishlists, juniorsWishlists);
+        teams.ForAll(t =>
+        {
+            t.Hackathon = hackathon;
+            t.HackathonId = hackathonId;
+        });
+        
+        TeamRepository.AddTeams(teams);
     }
 }

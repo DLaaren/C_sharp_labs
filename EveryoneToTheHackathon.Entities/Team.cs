@@ -14,7 +14,7 @@ public class Team
     /* Navigation properties */
     public int? HackathonId { get; set; }
     public Hackathon? Hackathon { get; set; }
-    public List<Employee>? Employees { get; set; }
+    public List<Employee> Employees { get; set; } = [];
     /* Navigation properties */
     
     /* Private properties for inner logic */

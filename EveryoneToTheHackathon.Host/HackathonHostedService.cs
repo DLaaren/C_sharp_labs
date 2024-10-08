@@ -10,7 +10,7 @@ public class HackathonHostedService : IHostedService
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<HackathonHostedService> _logger;
-    private IHackathon? _hackathon;
+    private Hackathon? _hackathon;
     private readonly int _hackathonRounds;
     
     private readonly IHackathonRepository _hackathonRepository;
@@ -36,7 +36,7 @@ public class HackathonHostedService : IHostedService
         
         for (int round = 1; round <= _hackathonRounds; round++)
         {
-            _hackathon = _serviceProvider.GetRequiredService<IHackathon>();
+            _hackathon = _serviceProvider.GetRequiredService<Hackathon>();
             StartHackathon(_hackathon, cancellationToken);
         }
 
@@ -48,7 +48,7 @@ public class HackathonHostedService : IHostedService
         return Task.CompletedTask;
     }
 
-    private void StartHackathon(IHackathon hackathon, CancellationToken cancellationToken)
+    private void StartHackathon(Hackathon hackathon, CancellationToken cancellationToken)
     {
         _hackathonRepository.AddHackathon(hackathon);
         cancellationToken.ThrowIfCancellationRequested();

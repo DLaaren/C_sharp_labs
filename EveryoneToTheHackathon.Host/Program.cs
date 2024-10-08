@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 var builder = Host.CreateApplicationBuilder(args);
 builder.Configuration.AddJsonFile("appsettings.json", true, true);
@@ -22,11 +23,11 @@ List<Employee> juniors = (List<Employee>)CsvParser.ParseCsvFileWithEmployees(
 string connString =
     String.Format(
         "Host={0};Port={1};Database={2};Username={3};Password={4};SSLMode=Prefer;Pooling=false",
-        builder.Configuration["Database:Host"] ?? throw new JsonException(),
-        builder.Configuration["Database:Port"] ?? throw new JsonException(),
-        builder.Configuration["Database:Database"] ?? throw new JsonException(),
-        builder.Configuration["Database:Username"] ?? throw new JsonException(),
-        builder.Configuration["Database:Password"] ?? throw new JsonException()
+        builder.Configuration["Database:Host"] ?? throw new SettingsException(),
+        builder.Configuration["Database:Port"] ?? throw new SettingsException(),
+        builder.Configuration["Database:Database"] ?? throw new SettingsException(),
+        builder.Configuration["Database:Username"] ?? throw new SettingsException(),
+        builder.Configuration["Database:Password"] ?? throw new SettingsException()
     );
 
 builder.Services.AddDbContextFactory<AppDbContext>(options =>
@@ -35,7 +36,7 @@ builder.Services.AddDbContextFactory<AppDbContext>(options =>
     options.EnableDetailedErrors();
 });
 
-builder.Services.AddTransient<IHackathon, Hackathon>(
+builder.Services.AddTransient<Hackathon>(
     h => new Hackathon(
         teamLeads,
         juniors,
