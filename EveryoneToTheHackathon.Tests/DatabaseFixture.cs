@@ -2,7 +2,7 @@ using EveryoneToTheHackathon.Entities;
 
 namespace EveryoneToTheHackathon.Tests;
 
-public class DatabaseFixture : IDisposable
+public abstract class DatabaseFixture : IDisposable
 {
     public readonly List<Employee> TeamLeads;
     public readonly List<Employee> Juniors;
@@ -10,7 +10,7 @@ public class DatabaseFixture : IDisposable
     public readonly List<Wishlist> JuniorsWishlists;
     public readonly List<Team> Teams;
 
-    public DatabaseFixture()
+    protected DatabaseFixture()
     {
         TeamLeads =
         [
@@ -33,12 +33,12 @@ public class DatabaseFixture : IDisposable
         JuniorsWishlists = new List<Wishlist>(5);
         for (var i = 1; i <= TeamLeads.Count; i++)
         {
-            Random seed = new Random(i);
+            var seed = new Random(i);
             TeamLeadsWishlists.Add(new Wishlist(i, EmployeeTitle.TeamLead, Enumerable.Range(1, 5).OrderBy(_ => seed.Next()).ToArray()));
         }
         for (var i = 1; i <= Juniors.Count; i++)
         {
-            Random seed = new Random(i * 100);
+            var seed = new Random(i * 100);
             JuniorsWishlists.Add(new Wishlist(i, EmployeeTitle.Junior, Enumerable.Range(1, 5).OrderBy(_ => seed.Next()).ToArray()));
         }
         

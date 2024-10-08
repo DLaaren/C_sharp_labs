@@ -1,10 +1,13 @@
 using EveryoneToTheHackathon.Entities;
 using EveryoneToTheHackathon.Host;
 using EveryoneToTheHackathon.EmployeeService;
+using EveryoneToTheHackathon.Repositories;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Options;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,10 +26,26 @@ var juniors = (List<Employee>)CsvParser.ParseCsvFileWithEmployees(
     builder.Configuration["Resources:JuniorsList"] ?? "Resources/Juniors5.csv", EmployeeTitle.Junior);
 var hrManagerUri = new Uri(builder.Configuration["HrManagerUri"] ?? throw new SettingsException());
 
-var id = builder.Configuration["ID"] ?? "1";//throw new NullReferenceException();
-var title = builder.Configuration["TITLE"] ?? "Junior";//throw new NullReferenceException();
-var name = builder.Configuration["NAME"] ?? "Puos";//throw new NullReferenceException();
+var id = builder.Configuration["ID"] ?? throw new SettingsException();
+var title = builder.Configuration["TITLE"] ?? throw new SettingsException();
+var name = builder.Configuration["NAME"] ?? throw new SettingsException();
 var employee = new Employee(Convert.ToInt32(id), title, name);
+
+var connString =
+    String.Format(
+        "Host={0};Port={1};Database={2};Username={3};Password={4};SSLMode=Prefer;Pooling=false",
+        builder.Configuration["Database:Host"] ?? throw new SettingsException(),
+        builder.Configuration["Database:Port"] ?? throw new SettingsException(),
+        builder.Configuration["Database:Database"] ?? throw new SettingsException(),
+        builder.Configuration["Database:Username"] ?? throw new SettingsException(),
+        builder.Configuration["Database:Password"] ?? throw new SettingsException()
+    );
+
+builder.Services.AddDbContextFactory<AppDbContext>(options =>
+{
+    options.UseNpgsql(connString);
+    options.EnableDetailedErrors();
+});
 
 builder.Services.AddMassTransit(x =>
 {
@@ -43,14 +62,20 @@ builder.Services.AddMassTransit(x =>
 });
 
 builder.Services.AddHttpClient<EmployeeBackgroundService>(client => client.BaseAddress = hrManagerUri);
-builder.Services.AddMvc();
+
 builder.Services.AddOptions();
 builder.Services.Configure<ServiceSettings>(settings =>
 {
     settings.Employee = employee;
-    settings.ProbableTeammates = employee.Title.Equals("TeamLead") ? juniors : teamLeads;
+    settings.ProbableTeammates = employee.Title.Equals(EmployeeTitle.TeamLead) ? juniors : teamLeads;
 });
-builder.Services.AddSingleton<EmployeeService>(e => new EmployeeService(e.GetService<IOptions<ServiceSettings>>()!));
+
+builder.Services.AddSingleton<IHackathonRepository, HackathonRepository>();
+builder.Services.AddSingleton<IEmployeeRepository, EmployeeRepository>();
+builder.Services.AddSingleton<IWishlistRepository, WishlistRepository>();
+
+builder.Services.AddSingleton<EmployeeService>();
+
 builder.Services.AddHostedService<EmployeeBackgroundService>(e => 
     new EmployeeBackgroundService(
         e.GetRequiredService<IBusControl>(),
@@ -63,6 +88,9 @@ builder.Services.AddControllers().AddApplicationPart(typeof(EmployeeController).
 var app = builder.Build();
 
 app.UseRouting();
+
+#pragma warning disable ASP0014
 app.UseEndpoints(endpoints => endpoints.MapControllers());
+#pragma warning restore ASP0014
 
 await app.RunAsync();

@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EveryoneToTheHackathon.Repositories.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240925104347_InitialCreate")]
+    [Migration("20241008073559_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />

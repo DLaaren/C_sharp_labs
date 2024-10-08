@@ -1,40 +1,33 @@
 ﻿networks:
-  database:
-    name: database
+  app:
     driver: bridge
-  hackathon:
-    name: hackathon
-    driver: bridge
-  rabbitmq:
-    name: rabbitmq
-    driver: bridge
-
+    name: app
 
 services:
     
   database:
     image: "postgres:16-alpine"
     container_name: postgresql
+    
     environment:
-      POSTGRES_USER: app
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: hackathon
-      PGDATA: /var/lib/postgresql/data/pgdata
+      - POSTGRES_DB=hackathon
+      - POSTGRES_USER=app
+      - POSTGRES_PASSWORD=password
+      - PGDATA=/var/lib/postgresql/data/pgdata
+      
+    ports:
+      - "5432:5432"
+      
+    networks:
+      - app
       
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      test: [ "CMD-SHELL", "pg_isready -U app -d hackathon" ]
       interval: 5s
       timeout: 10s
       retries: 5
       start_period: 5s
-
-    ports:
-      - "5433:5432"
-
-    networks:
-      - database
-      - hackathon
-        
+      
         
   rabbitmq:
     image: "rabbitmq:4-management-alpine"
@@ -44,16 +37,15 @@ services:
       - "5672:5672"
       - "15672:15672"
       
+    networks:
+      - app
+      
     healthcheck:
       test: [ "CMD-SHELL", "rabbitmq-diagnostics -q ping"]
       interval: 5s
       timeout: 10s
       retries: 5
       start_period: 5s
-    
-    networks:
-      - rabbitmq
-
 
   hr_director:
     image: "hackathon/hr_director:latest"
@@ -66,6 +58,9 @@ services:
     environment:
       - EMPLOYEES_NUM=10
       - HACKATHONS_NUM=10
+        
+    networks:
+      - app
       
     healthcheck:
       test: [ "CMD-SHELL", "curl --fail http://localhost:8083/api/hr_director/health || exit 1" ]
@@ -81,34 +76,28 @@ services:
         condition: service_healthy
         
       teamlead-1:
-        condition: service_healthy
+        condition: service_started
       teamlead-2:
-        condition: service_healthy
+        condition: service_started
       teamlead-3:
-        condition: service_healthy
+        condition: service_started
       teamlead-4:
-        condition: service_healthy
+        condition: service_started
       teamlead-5:
-        condition: service_healthy
+        condition: service_started
       junior-1:
-        condition: service_healthy
+        condition: service_started
       junior-2:
-        condition: service_healthy
+        condition: service_started
       junior-3:
-        condition: service_healthy
+        condition: service_started
       junior-4:
-        condition: service_healthy
+        condition: service_started
       junior-5:
-        condition: service_healthy
+        condition: service_started
       
       hr_manager:
-        condition: service_healthy
-
-    networks:
-      - database
-      - hackathon
-      - rabbitmq
-        
+        condition: service_started
         
   hr_manager:
     image: "hackathon/hr_manager:latest"
@@ -121,21 +110,22 @@ services:
     environment:
       - EMPLOYEES_NUM=10
       
-    healthcheck:
-      test: [ "CMD-SHELL", "curl --fail http://localhost:8082/api/hr_manager/health || exit 1" ]
-      interval: 5s
-      timeout: 10s
-      retries: 5
-      start_period: 5s
+    networks:
+      - app 
+      
+#    healthcheck:
+#      test: [ "CMD-SHELL", "curl --fail http://localhost:8082/api/hr_manager/health || exit 1" ]
+#      interval: 5s
+#      timeout: 10s
+#      retries: 5
+#      start_period: 5s
       
     depends_on:
+      database:
+        condition: service_healthy
       rabbitmq:
         condition: service_healthy
-    
-    networks:
-      - hackathon
-      - rabbitmq
-        
+       
         
   teamlead-1:
     image: "hackathon/employee:latest"
@@ -149,22 +139,23 @@ services:
       - ID=1
       - TITLE=TeamLead
       - NAME=Филиппова Ульяна
+      
+    networks:
+      - app
         
-    healthcheck:
-      test: [ "CMD-SHELL", "curl --fail http://localhost:8081/api/employee/health || exit 1" ]
-      interval: 5s
-      timeout: 10s
-      retries: 5
-      start_period: 5s
+#    healthcheck:
+#      test: [ "CMD-SHELL", "curl --fail http://localhost:8081/api/employee/health || exit 1" ]
+#      interval: 5s
+#      timeout: 10s
+#      retries: 5
+#      start_period: 5s
     
     depends_on:
+      database:
+        condition: service_healthy
       rabbitmq:
         condition: service_healthy
-    
-    networks:
-      - hackathon
-      - rabbitmq
-
+        
 
   teamlead-2:
     image: "hackathon/employee:latest"
@@ -179,20 +170,21 @@ services:
       - TITLE=TeamLead
       - NAME=Николаев Григорий
 
-    healthcheck:
-      test: [ "CMD-SHELL", "curl --fail http://localhost:8081/api/employee/health || exit 1" ]
-      interval: 5s
-      timeout: 10s
-      retries: 5
-      start_period: 5s
+    networks:
+      - app
+
+#    healthcheck:
+#      test: [ "CMD-SHELL", "curl --fail http://localhost:8081/api/employee/health || exit 1" ]
+#      interval: 5s
+#      timeout: 10s
+#      retries: 5
+#      start_period: 5s
 
     depends_on:
+      database:
+        condition: service_healthy
       rabbitmq:
         condition: service_healthy
-
-    networks:
-      - hackathon
-      - rabbitmq
 
 
   teamlead-3:
@@ -208,20 +200,21 @@ services:
       - TITLE=TeamLead
       - NAME=Андреева Вероника
 
-    healthcheck:
-      test: [ "CMD-SHELL", "curl --fail http://localhost:8081/api/employee/health || exit 1" ]
-      interval: 5s
-      timeout: 10s
-      retries: 5
-      start_period: 5s
+    networks:
+      - app
+
+#    healthcheck:
+#      test: [ "CMD-SHELL", "curl --fail http://localhost:8081/api/employee/health || exit 1" ]
+#      interval: 5s
+#      timeout: 10s
+#      retries: 5
+#      start_period: 5s
 
     depends_on:
+      database:
+        condition: service_healthy
       rabbitmq:
         condition: service_healthy
-
-    networks:
-      - hackathon
-      - rabbitmq
 
 
   teamlead-4:
@@ -237,20 +230,21 @@ services:
       - TITLE=TeamLead
       - NAME=Коротков Михаил
 
-    healthcheck:
-      test: [ "CMD-SHELL", "curl --fail http://localhost:8081/api/employee/health || exit 1" ]
-      interval: 5s
-      timeout: 10s
-      retries: 5
-      start_period: 5s
+    networks:
+      - app
+
+#    healthcheck:
+#      test: [ "CMD-SHELL", "curl --fail http://localhost:8081/api/employee/health || exit 1" ]
+#      interval: 5s
+#      timeout: 10s
+#      retries: 5
+#      start_period: 5s
 
     depends_on:
+      database:
+        condition: service_healthy
       rabbitmq:
         condition: service_healthy
-
-    networks:
-      - hackathon
-      - rabbitmq
 
 
   teamlead-5:
@@ -266,20 +260,21 @@ services:
       - TITLE=TeamLead
       - NAME=Кузнецов Александр
 
-    healthcheck:
-      test: [ "CMD-SHELL", "curl --fail http://localhost:8081/api/employee/health || exit 1" ]
-      interval: 5s
-      timeout: 10s
-      retries: 5
-      start_period: 5s
+    networks:
+      - app
+
+#    healthcheck:
+#      test: [ "CMD-SHELL", "curl --fail http://localhost:8081/api/employee/health || exit 1" ]
+#      interval: 5s
+#      timeout: 10s
+#      retries: 5
+#      start_period: 5s
 
     depends_on:
+      database:
+        condition: service_healthy
       rabbitmq:
         condition: service_healthy
-
-    networks:
-      - hackathon
-      - rabbitmq
 
 
   junior-1:
@@ -295,20 +290,21 @@ services:
       - TITLE=Junior
       - NAME=Юдин Адам
 
-    healthcheck:
-      test: [ "CMD-SHELL", "curl --fail http://localhost:8081/api/employee/health || exit 1" ]
-      interval: 5s
-      timeout: 10s
-      retries: 5
-      start_period: 5s
+    networks:
+      - app
+
+#    healthcheck:
+#      test: [ "CMD-SHELL", "curl --fail http://localhost:8081/api/employee/health || exit 1" ]
+#      interval: 5s
+#      timeout: 10s
+#      retries: 5
+#      start_period: 5s
 
     depends_on:
+      database:
+        condition: service_healthy
       rabbitmq:
         condition: service_healthy
-
-    networks:
-      - hackathon
-      - rabbitmq
 
 
   junior-2:
@@ -324,20 +320,21 @@ services:
       - TITLE=Junior
       - NAME=Яшина Яна
 
-    healthcheck:
-      test: [ "CMD-SHELL", "curl --fail http://localhost:8081/api/employee/health || exit 1" ]
-      interval: 5s
-      timeout: 10s
-      retries: 5
-      start_period: 5s
+    networks:
+      - app
+
+#    healthcheck:
+#      test: [ "CMD-SHELL", "curl --fail http://localhost:8081/api/employee/health || exit 1" ]
+#      interval: 5s
+#      timeout: 10s
+#      retries: 5
+#      start_period: 5s
 
     depends_on:
+      database:
+        condition: service_healthy
       rabbitmq:
         condition: service_healthy
-
-    networks:
-      - hackathon
-      - rabbitmq
 
 
   junior-3:
@@ -353,20 +350,21 @@ services:
       - TITLE=Junior
       - NAME=Никитина Вероника
 
-    healthcheck:
-      test: [ "CMD-SHELL", "curl --fail http://localhost:8081/api/employee/health || exit 1" ]
-      interval: 5s
-      timeout: 10s
-      retries: 5
-      start_period: 5s
+    networks:
+      - app
+
+#    healthcheck:
+#      test: [ "CMD-SHELL", "curl --fail http://localhost:8081/api/employee/health || exit 1" ]
+#      interval: 5s
+#      timeout: 10s
+#      retries: 5
+#      start_period: 5s
 
     depends_on:
+      database:
+        condition: service_healthy
       rabbitmq:
         condition: service_healthy
-
-    networks:
-      - hackathon
-      - rabbitmq
 
 
   junior-4:
@@ -382,20 +380,21 @@ services:
       - TITLE=Junior
       - NAME=Рябинин Александр
 
-    healthcheck:
-      test: [ "CMD-SHELL", "curl --fail http://localhost:8081/api/employee/health || exit 1" ]
-      interval: 5s
-      timeout: 10s
-      retries: 5
-      start_period: 5s
+    networks:
+      - app
+
+#    healthcheck:
+#      test: [ "CMD-SHELL", "curl --fail http://localhost:8081/api/employee/health || exit 1" ]
+#      interval: 5s
+#      timeout: 10s
+#      retries: 5
+#      start_period: 5s
 
     depends_on:
+      database:
+        condition: service_healthy
       rabbitmq:
         condition: service_healthy
-
-    networks:
-      - hackathon
-      - rabbitmq
 
 
   junior-5:
@@ -411,17 +410,18 @@ services:
       - TITLE=Junior
       - NAME=Ильин Тимофей
 
-    healthcheck:
-      test: [ "CMD-SHELL", "curl --fail http://localhost:8081/api/employee/health || exit 1" ]
-      interval: 5s
-      timeout: 10s
-      retries: 5
-      start_period: 5s
+    networks:
+      - app
+
+#    healthcheck:
+#      test: [ "CMD-SHELL", "curl --fail http://localhost:8081/api/employee/health || exit 1" ]
+#      interval: 5s
+#      timeout: 10s
+#      retries: 5
+#      start_period: 5s
 
     depends_on:
+      database:
+        condition: service_healthy
       rabbitmq:
         condition: service_healthy
-
-    networks:
-      - hackathon
-      - rabbitmq

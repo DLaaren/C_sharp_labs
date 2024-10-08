@@ -1,13 +1,6 @@
 namespace EveryoneToTheHackathon.Messages;
 
-public class HackathonStarted
+public class HackathonStarted(int hackathonId)
 {
-    public HackathonStarted() { }
-    
-    public HackathonStarted(string message)
-    {
-        Message = message;
-    }
-
-    public string Message { get; set; }
+    public int HackathonId { get; set; } = hackathonId;
 }

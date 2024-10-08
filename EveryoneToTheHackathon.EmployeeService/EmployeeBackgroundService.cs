@@ -14,35 +14,11 @@ public class EmployeeBackgroundService(
     EmployeeService employeeService)
     : BackgroundService, IConsumer<HackathonStarted>
 {
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        while (true)
-        {
-            employeeService.HackathonStartedTcs = new TaskCompletionSource<bool>();
-            
-            logger.LogInformation("Waiting for a hackathon to start");
-            await employeeService.HackathonStartedTcs.Task;
-            
-            employeeService.ResetAll();
-
-            //await SendEmployeeAsync(employeeService.Employee, stoppingToken);
-            await SendEmployeeAsyncViaMessage(employeeService.Employee, stoppingToken);
-            logger.LogInformation("Employee 'Id = {Id} Title = {Title} Name = {Name}' has sent his data;",
-                employeeService.Employee.Id, employeeService.Employee.Title, employeeService.Employee.Name);
-
-            logger.LogInformation("Employee 'Id = {Id} Title = {Title} Name = {Name}' is making his wishlist;",
-                employeeService.Employee.Id, employeeService.Employee.Title, employeeService.Employee.Name);
-            var wishlist = employeeService.Employee.MakeWishlist(employeeService.ProbableTeammates);
-
-            //await SendWishlistAsync(wishlist, stoppingToken);
-            await SendWishlistAsyncViaMessage(wishlist, stoppingToken);
-            logger.LogInformation(
-                "Employee 'Id = {Id} Title = {Title} Name = {Name}' has sent his wishlist: {Wishlist};",
-                employeeService.Employee.Id, employeeService.Employee.Title, employeeService.Employee.Name,
-                wishlist.DesiredEmployees);
-        }
-
-        await Task.CompletedTask;
+        logger.LogInformation("Waiting for a hackathon to start");
+        while (true) {}
+        // ReSharper disable once FunctionNeverReturns
     }
 
     private async Task SendEmployeeAsync(Employee employeeToSend, CancellationToken stoppingToken)
@@ -52,23 +28,6 @@ public class EmployeeBackgroundService(
         var response = await httpClient.PostAsync(httpClient.BaseAddress + "api/hr_manager/employee", content, stoppingToken);
         response.EnsureSuccessStatusCode();
     }
-
-    private async Task SendEmployeeAsyncViaMessage(Employee employeeToSend, CancellationToken stoppingToken)
-    {
-        await busControl.Publish<EmployeeSent>(new {
-            employeeToSend.Id, 
-            employeeToSend.Title,
-            employeeToSend.Name
-        }, stoppingToken);
-    }
-    
-    private async Task SendWishlistAsyncViaMessage(Wishlist wishlistToSend, CancellationToken stoppingToken)
-    {
-        await busControl.Publish<WishlistSent>(new  WishlistSent(
-            wishlistToSend.EmployeeId, 
-            wishlistToSend.EmployeeTitle,
-            wishlistToSend.DesiredEmployees), stoppingToken);
-    }
     
     private async Task SendWishlistAsync(Wishlist wishlistToSend, CancellationToken stoppingToken)
     {
@@ -77,11 +36,33 @@ public class EmployeeBackgroundService(
         var response = await httpClient.PostAsync(httpClient.BaseAddress + "api/hr_manager/wishlist", content, stoppingToken);
         response.EnsureSuccessStatusCode();
     }
+    
+    private void SendEmployeeAndWishlistStoredAsyncViaMessage()
+    {
+        var employee = employeeService.Employee;
+        busControl.Publish(
+            new EmployeeAndWishlistSent($"Employee 'Id = {employee.Id} " +
+                                        $"Title = {employee.Title} " +
+                                        $"Name = {employee.Name}' " +
+                                        $"has stored his data", 
+                employee.Id, employee.Title, employee.Name));
+        logger.LogInformation("Employee has send his hackathon confirmation");
+    }
 
     public Task Consume(ConsumeContext<HackathonStarted> context)
     {
-        logger.LogInformation(context.Message.Message);
-        employeeService.HackathonStartedTcs.TrySetResult(true);
+        var hackathonId = context.Message.HackathonId;
+        
+        logger.LogInformation("Hackathon with id = {hackathonId} has started", hackathonId);
+        
+        var wishlist = employeeService.Employee.MakeWishlist(employeeService.ProbableTeammates);
+        
+        employeeService.SaveEmployeeAndWishlist(wishlist, hackathonId);
+        logger.LogInformation("Employee has stored his data");
+            
+        SendEmployeeAndWishlistStoredAsyncViaMessage();
+        
+        logger.LogInformation("Waiting for a hackathon to start");
         return Task.CompletedTask;
     }
 }

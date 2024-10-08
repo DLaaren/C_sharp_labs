@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 namespace EveryoneToTheHackathon.Entities;
 
-public class Hackathon : IHackathon
+public class Hackathon
 {
     /* Public properties for database */
     [Key]
@@ -13,9 +13,9 @@ public class Hackathon : IHackathon
     /* Public properties for database */
 
     /* Navigation properties */
-    public IEnumerable<Employee>? Employees { get; set; }
-    public IEnumerable<Wishlist>? Wishlists { get; set; }
-    public IEnumerable<Team>? Teams { get; set; }
+    public IEnumerable<Employee> Employees { get; set; } = new List<Employee>();
+    public IEnumerable<Wishlist> Wishlists { get; set; } = new List<Wishlist>();
+    public IEnumerable<Team> Teams { get; set; } = new List<Team>();
     /* Navigation properties */
     
     /* Private properties for inner logic */
@@ -41,7 +41,6 @@ public class Hackathon : IHackathon
         _hrManager = hrManager;
         _hrDirector = hrDirector;
 
-        Employees = new List<Employee>();
         ((List<Employee>)Employees).AddRange(teamLeads);
         ((List<Employee>)Employees).AddRange(juniors);
     }

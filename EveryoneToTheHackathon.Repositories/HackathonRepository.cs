@@ -1,54 +1,49 @@
 using EveryoneToTheHackathon.Entities;
-using EveryoneToTheHackathon.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace EveryoneToTheHackathon.Repositories;
 
-public class HackathonRepository(/*AppDbContext dbContext,*/ IDbContextFactory<AppDbContext> myDbContextFactory) : IHackathonRepository
+public class HackathonRepository(IDbContextFactory<AppDbContext> myDbContextFactory) : IHackathonRepository
 {
-    private AppDbContext _dbContext = myDbContextFactory.CreateDbContext();
-    //private readonly AppDbContext _dbContext = dbContext;
-
-    public IHackathon? GetHackathonById(int hackathonId)
+    private readonly AppDbContext _dbContext = myDbContextFactory.CreateDbContext();
+    
+    public Hackathon? GetHackathonById(int hackathonId)
     {
         return _dbContext.Hackathons.Find(hackathonId);
     }
     
-    public IEnumerable<IHackathon> GetHackathons()
+    public IEnumerable<Hackathon> GetHackathons()
     {
         return _dbContext.Hackathons.ToList();
     }
 
-    public void AddHackathon(IHackathon hackathon)
+    public void AddHackathon(Hackathon hackathon)
     {
-        if (((Hackathon)hackathon).Employees != null)
+        var allIds = _dbContext.Employees.Select(e => e.Id).ToList();
+        foreach (var employee in hackathon.Employees!)
         {
-            var allIds = _dbContext.Employees.Select(e => e.Id).ToList();
-            foreach (var employee in ((Hackathon)hackathon).Employees!)
-            {
-                if (!allIds.Contains(employee.Id))
-                    _dbContext.Employees.Add(employee);
-            }
+            if (!allIds.Contains(employee.Id))
+                _dbContext.Employees.Add(employee);
         }
 
         _dbContext.Entry(hackathon).State = EntityState.Added;
         _dbContext.SaveChanges();
     }
 
-    public void AddHackathons(IEnumerable<IHackathon> hackathons)
+    public void AddHackathons(IEnumerable<Hackathon> hackathons)
     {
         _dbContext.AddRange(hackathons);
         _dbContext.SaveChanges();
     }
 
-    public void UpdateHackathon(IHackathon hackathon)
+    public void UpdateHackathon(Hackathon hackathon)
     {
         //_dbContext.UpdateRange(((Hackathon)hackathon).Employees);
         _dbContext.Update(hackathon);
         _dbContext.SaveChanges();
     }
 
-    public void UpdateHackathons(IEnumerable<IHackathon> hackathons)
+    public void UpdateHackathons(IEnumerable<Hackathon> hackathons)
     {
         ((List<Hackathon>)hackathons).ForEach(UpdateHackathon);
         _dbContext.SaveChanges();
@@ -62,11 +57,9 @@ public class HackathonRepository(/*AppDbContext dbContext,*/ IDbContextFactory<A
 
     public void DeleteHackathon(int hackathonId)
     {
-        Hackathon? hackathon = _dbContext.Hackathons.Find(hackathonId);
-        if (hackathon != null)
-        {
-            _dbContext.Remove(hackathon);
-            _dbContext.SaveChanges();
-        }
+        var hackathon = _dbContext.Hackathons.Find(hackathonId);
+        if (hackathon == null) return;
+        _dbContext.Remove(hackathon);
+        _dbContext.SaveChanges();
     }
 }

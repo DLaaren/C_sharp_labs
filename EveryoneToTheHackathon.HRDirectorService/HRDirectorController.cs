@@ -1,4 +1,3 @@
-using System.Collections.Concurrent;
 using System.Diagnostics;
 using EveryoneToTheHackathon.Dtos;
 using EveryoneToTheHackathon.Entities;
@@ -22,7 +21,7 @@ public class HrDirectorController(HrDirectorService hrDirectorService)
         
         Debug.Assert(employees.Count == HrDirectorService.EmployeesNumber);
 
-        HrDirectorService.Employees = new ConcurrentBag<Employee>(employees);
+        // HrDirectorService.Employees = new ConcurrentBag<Employee>(employees);
         
         return Task.FromResult<IActionResult>(Ok());
     }
@@ -35,7 +34,7 @@ public class HrDirectorController(HrDirectorService hrDirectorService)
 
         Debug.Assert(wishlists.Count == HrDirectorService.EmployeesNumber);
         
-        HrDirectorService.Wishlists = new ConcurrentBag<Wishlist>(wishlists);
+        // HrDirectorService.Wishlists = new ConcurrentBag<Wishlist>(wishlists);
         
         return Task.FromResult<IActionResult>(Ok());
     }
@@ -50,8 +49,8 @@ public class HrDirectorController(HrDirectorService hrDirectorService)
 
         Debug.Assert(teams.Count == HrDirectorService.EmployeesNumber / 2);
         
-        HrDirectorService.Teams = new ConcurrentBag<Team>(teams);
-        HrDirectorService.TeamsGotTcs.SetResult(true);
+        // HrDirectorService.Teams = new ConcurrentBag<Team>(teams);
+        // HrDirectorService.TeamsGotTcs.SetResult(true);
         
         return Task.FromResult<IActionResult>(Ok());
     }

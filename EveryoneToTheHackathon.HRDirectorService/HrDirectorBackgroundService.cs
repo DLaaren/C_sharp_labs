@@ -1,4 +1,4 @@
-using EveryoneToTheHackathon.Entities;
+using System.Diagnostics;
 using EveryoneToTheHackathon.Messages;
 using MassTransit;
 
@@ -8,54 +8,44 @@ public class HrDirectorBackgroundService(
     IBusControl busControl,
     ILogger<HrDirectorBackgroundService> logger,
     HrDirectorService hrDirectorService)
-    : BackgroundService, IConsumer<EmployeeSent>, IConsumer<WishlistSent>
+    : BackgroundService, IConsumer<TeamsStored>
 {
+    private int CurrHackathonId { get; set; } = -1;
+    private TaskCompletionSource<bool>? _hackathonFinished;
+    
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        for (var i = 0; i < hrDirectorService.HackathonsNumber; i++)//, await Task.Delay(1000, stoppingToken))
+        for (var i = 0; i < hrDirectorService.HackathonsNumber; i++)
         {
-            await AnnounceHackathon(stoppingToken);
-            logger.LogInformation("HRDirector has announced start of the hackathon");
-
-            logger.LogInformation("HRDirector waiting for employees, wishlists, teams;");
-
-            await hrDirectorService.EmployeesGotTcs.Task;
-            logger.LogInformation("HRDirector got all employees;");
-            await hrDirectorService.WishlistsGotTcs.Task;
-            logger.LogInformation("HRDirector got all wishlists;");
-            await hrDirectorService.TeamsGotTcs.Task;
-            logger.LogInformation("HRDirector got all teams;");
-
-            var meanSatisfactionIndex = hrDirectorService.CalculationMeanSatisfactionIndex();
-
-            hrDirectorService.SaveHackathon(meanSatisfactionIndex);
-            logger.LogInformation("HRDirector has stored all information to database;");
-
-            logger.LogInformation("HRDirector has counted mean satisfaction index: {index}", meanSatisfactionIndex);
+            await StartHackathon(stoppingToken);
+            
+            Debug.Assert(_hackathonFinished != null);
+            await _hackathonFinished.Task;
         }
-
         await Task.CompletedTask;
     }
 
-    private async Task AnnounceHackathon(CancellationToken stoppingToken)
+    private async Task StartHackathon(CancellationToken stoppingToken)
     {
-        await hrDirectorService.ResetAll();
-        await busControl.Publish(new HackathonStarted("Hackathon has started"), stoppingToken);
+        CurrHackathonId = hrDirectorService.StartHackathon();
+        logger.LogInformation("Starting hackathon {id}", CurrHackathonId);
+        
+        _hackathonFinished = new TaskCompletionSource<bool>();
+        
+        await busControl.Publish(new HackathonStarted(CurrHackathonId), stoppingToken);
+        logger.LogInformation("HRDirector has announced start of the hackathon");
     }
+    
 
-    public Task Consume(ConsumeContext<EmployeeSent> context)
+    public Task Consume(ConsumeContext<TeamsStored> context)
     {
-        hrDirectorService.Employees.Add(new Employee(context.Message.Id, context.Message.Title, context.Message.Name));
-        if (hrDirectorService.Employees.Count == hrDirectorService.EmployeesNumber)
-            hrDirectorService.EmployeesGotTcs.TrySetResult(true);
-        return Task.CompletedTask;
-    }
-
-    public Task Consume(ConsumeContext<WishlistSent> context)
-    {
-        hrDirectorService.Wishlists.Add(new Wishlist(context.Message.EmployeeId, context.Message.EmployeeTitle, context.Message.DesiredEmployees));
-        if (hrDirectorService.Wishlists.Count == hrDirectorService.EmployeesNumber)
-            hrDirectorService.WishlistsGotTcs.TrySetResult(true);
+        logger.LogInformation("HRManager has built {count} teams", context.Message.Count);
+        
+        var meanSatisfactionIndex = hrDirectorService.CalculationMeanSatisfactionIndex(CurrHackathonId);
+        logger.LogInformation("HRDirector has counted mean satisfaction index: {index}", meanSatisfactionIndex);
+        
+        Debug.Assert(_hackathonFinished != null);
+        _hackathonFinished.TrySetResult(true);
         return Task.CompletedTask;
     }
 }

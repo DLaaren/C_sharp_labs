@@ -4,12 +4,12 @@ namespace EveryoneToTheHackathon.Repositories;
 
 public interface IHackathonRepository
 {
-    public IHackathon? GetHackathonById(int hackathonId);
-    public IEnumerable<IHackathon> GetHackathons();
-    public void AddHackathon(IHackathon hackathon);
-    public void AddHackathons(IEnumerable<IHackathon> hackathons);
-    public void UpdateHackathon(IHackathon hackathon);
-    public void UpdateHackathons(IEnumerable<IHackathon> hackathons);
+    public Hackathon? GetHackathonById(int hackathonId);
+    public IEnumerable<Hackathon> GetHackathons();
+    public void AddHackathon(Hackathon hackathon);
+    public void AddHackathons(IEnumerable<Hackathon> hackathons);
+    public void UpdateHackathon(Hackathon hackathon);
+    public void UpdateHackathons(IEnumerable<Hackathon> hackathons);
     public double GetMeanSatisfactionIndexForAllRounds();
     public void DeleteHackathon(int hackathonId);
 }
