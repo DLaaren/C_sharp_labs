@@ -22,15 +22,16 @@ public class EmployeeService(
     {
         var hackathon = HackathonRepository.GetHackathonById(hackathonId);
         Debug.Assert(hackathon != null);
+        
+        ((List<Hackathon>)Employee.Hackathons).Add(hackathon);
+        ((List<Wishlist>)Employee.Wishlists).Add(wishlist);
+        ((List<Employee>)hackathon.Employees).Add(Employee);
+        
         wishlist.Hackathon = hackathon;
         wishlist.HackathonId = hackathonId;
-        //((List<Wishlist>)Employee.Wishlists).Add(wishlist);
         
-        ((List<Employee>)hackathon.Employees).Add(Employee);
         ((List<Wishlist>)hackathon.Wishlists).Add(wishlist);
         
-        EmployeeRepository.AddEmployee(Employee);
-        WishlistRepository.AddWishlist(wishlist);
-        HackathonRepository.UpdateHackathon(hackathon);
+        EmployeeRepository.SaveEmployee(Employee, hackathon);
     }
 } 

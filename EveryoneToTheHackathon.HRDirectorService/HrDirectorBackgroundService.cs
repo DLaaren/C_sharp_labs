@@ -10,29 +10,26 @@ public class HrDirectorBackgroundService(
     HrDirectorService hrDirectorService)
     : BackgroundService, IConsumer<TeamsStored>
 {
-    private int CurrHackathonId { get; set; } = -1;
-    private TaskCompletionSource<bool>? _hackathonFinished;
-    
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         for (var i = 0; i < hrDirectorService.HackathonsNumber; i++)
         {
             await StartHackathon(stoppingToken);
             
-            Debug.Assert(_hackathonFinished != null);
-            await _hackathonFinished.Task;
+            Debug.Assert(hrDirectorService.HackathonFinished != null);
+            await hrDirectorService.HackathonFinished.Task;
         }
         await Task.CompletedTask;
     }
 
     private async Task StartHackathon(CancellationToken stoppingToken)
     {
-        CurrHackathonId = hrDirectorService.StartHackathon();
-        logger.LogInformation("Starting hackathon {id}", CurrHackathonId);
+        hrDirectorService.CurrHackathonId = hrDirectorService.StartHackathon();
+        logger.LogInformation("Starting hackathon with id = {id}", hrDirectorService.CurrHackathonId);
         
-        _hackathonFinished = new TaskCompletionSource<bool>();
+        hrDirectorService.HackathonFinished = new TaskCompletionSource<bool>();
         
-        await busControl.Publish(new HackathonStarted(CurrHackathonId), stoppingToken);
+        await busControl.Publish(new HackathonStarted(hrDirectorService.CurrHackathonId), stoppingToken);
         logger.LogInformation("HRDirector has announced start of the hackathon");
     }
     
@@ -41,11 +38,11 @@ public class HrDirectorBackgroundService(
     {
         logger.LogInformation("HRManager has built {count} teams", context.Message.Count);
         
-        var meanSatisfactionIndex = hrDirectorService.CalculationMeanSatisfactionIndex(CurrHackathonId);
+        var meanSatisfactionIndex = hrDirectorService.CalculationMeanSatisfactionIndex(hrDirectorService.CurrHackathonId);
         logger.LogInformation("HRDirector has counted mean satisfaction index: {index}", meanSatisfactionIndex);
         
-        Debug.Assert(_hackathonFinished != null);
-        _hackathonFinished.TrySetResult(true);
+        Debug.Assert(hrDirectorService.HackathonFinished != null);
+        hrDirectorService.HackathonFinished.TrySetResult(true);
         return Task.CompletedTask;
     }
 }

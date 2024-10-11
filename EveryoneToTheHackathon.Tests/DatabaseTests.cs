@@ -62,7 +62,8 @@ public class DatabaseTests(DatabaseFixture fixture) : IClassFixture<DatabaseFixt
         Assert.Equal(hackathon.Teams, hackathonResult.Teams);
         
         // Clean up
-        hackathonService.DeleteHackathon(hackathon.Id);
+        dbContext.Hackathons.Remove(hackathon);
+        dbContext.SaveChanges();
     }
     
     
@@ -98,5 +99,8 @@ public class DatabaseTests(DatabaseFixture fixture) : IClassFixture<DatabaseFixt
         Assert.Equal(1.2, hackathonResult1.MeanSatisfactionIndex);
         Assert.Equal(4.2, hackathonResult2.MeanSatisfactionIndex);
         Assert.Equal(2.7, hackathonService.GetMeanSatisfactionIndexForAllRounds());
+        dbContext.Hackathons.Remove(hackathon1);
+        dbContext.Hackathons.Remove(hackathon2);
+        dbContext.SaveChanges();
     }
 }

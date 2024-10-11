@@ -45,7 +45,7 @@ services:
       interval: 5s
       timeout: 10s
       retries: 5
-      start_period: 5s
+      start_period: 7s
 
   hr_director:
     image: "hackathon/hr_director:latest"
