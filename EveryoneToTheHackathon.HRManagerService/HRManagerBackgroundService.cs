@@ -15,9 +15,6 @@ public class HrManagerBackgroundService(
     HrManagerService hrManagerService)
     : BackgroundService, IConsumer<HackathonStarted>, IConsumer<EmployeeAndWishlistSent>
 {
-    private int ReadyEmployeesCount { get; set; }
-    private int CurrHackathonId { get; set; } = -1;
-    
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
         logger.LogInformation("Waiting for a hackathon to start");
@@ -61,40 +58,40 @@ public class HrManagerBackgroundService(
     {
         busControl.Publish(
             new TeamsStored(count));
-        logger.LogInformation("Teams has been stored");
     }
     
-    public Task Consume(ConsumeContext<HackathonStarted> context)
+    public async Task Consume(ConsumeContext<HackathonStarted> context)
     {
-        CurrHackathonId = context.Message.HackathonId;
-        logger.LogInformation("Hackathon with id = {hackathonId} has started", CurrHackathonId);
+        hrManagerService.EmployeesAndWishlistsStored = new TaskCompletionSource<bool>();
+        hrManagerService.CurrHackathonId = context.Message.HackathonId;
+        logger.LogInformation("Hackathon with id = {hackathonId} has started", hrManagerService.CurrHackathonId);
+
+        await hrManagerService.EmployeesAndWishlistsStored.Task;
         
-        return Task.CompletedTask;
+        hrManagerService.BuildTeamsAndSave(hrManagerService.CurrHackathonId);
+        logger.LogInformation("Teams has been stored");
+            
+        SendTeamsStoredAsyncViaMessage(hrManagerService.ReadyEmployeesCount / 2);
+
+        hrManagerService.CurrHackathonId = -1;
+        hrManagerService.ReadyEmployeesCount = 0;
+        logger.LogInformation("Waiting for a hackathon to start");
+        
+        await Task.CompletedTask;
     }
     
    public Task Consume(ConsumeContext<EmployeeAndWishlistSent> context)
    {
-       while (CurrHackathonId == -1)
-       {
-           logger.LogWarning("Hackathon hasn't started yet");
-           return Task.CompletedTask;
-       }
-
        logger.LogInformation("Got message about stored Employee's with id = {id} title = {title} name = {name} data",
            context.Message.Id, context.Message.Title, context.Message.Name);
 
-       ReadyEmployeesCount += 1;
-       if (ReadyEmployeesCount < hrManagerService.EmployeesNumber) 
-           return Task.CompletedTask;
+       hrManagerService.ReadyEmployeesCount += 1;
+       if (hrManagerService.ReadyEmployeesCount < hrManagerService.EmployeesNumber) return Task.CompletedTask;
        
-       hrManagerService.BuildTeamsAndSave(CurrHackathonId);
-       logger.LogInformation("Teams has been stored");
-            
-       SendTeamsStoredAsyncViaMessage(ReadyEmployeesCount);
+       
+       Debug.Assert(hrManagerService.EmployeesAndWishlistsStored != null);
+       hrManagerService.EmployeesAndWishlistsStored.TrySetResult(true);
 
-       CurrHackathonId = -1;
-       ReadyEmployeesCount = 0;
-       logger.LogInformation("Waiting for a hackathon to start");
        return Task.CompletedTask;
    }
 }

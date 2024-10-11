@@ -2,7 +2,7 @@ using EveryoneToTheHackathon.Entities;
 
 namespace EveryoneToTheHackathon.Tests;
 
-public abstract class DatabaseFixture : IDisposable
+public class DatabaseFixture : IDisposable
 {
     public readonly List<Employee> TeamLeads;
     public readonly List<Employee> Juniors;
@@ -10,7 +10,7 @@ public abstract class DatabaseFixture : IDisposable
     public readonly List<Wishlist> JuniorsWishlists;
     public readonly List<Team> Teams;
 
-    protected DatabaseFixture()
+    public DatabaseFixture()
     {
         TeamLeads =
         [

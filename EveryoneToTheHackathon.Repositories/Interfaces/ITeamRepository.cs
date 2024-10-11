@@ -4,6 +4,8 @@ namespace EveryoneToTheHackathon.Repositories;
 
 public interface ITeamRepository
 {
-    public void AddTeams(IEnumerable<Team> teams);
+    public void AddTeam(Team team);
+    public void UpdateTeam(Team team);
+    public void SaveTeams(IEnumerable<Team> teams);
     public IEnumerable<Team> GetTeamsByHackathonId(int hackathonId);
 }

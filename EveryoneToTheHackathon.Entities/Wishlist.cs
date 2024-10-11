@@ -11,8 +11,8 @@ public class Wishlist
     public int Id { get; set; }
     public int EmployeeId { get; set; }
     public string EmployeeTitle { get; set; }
-    [Required]
-    public int[] DesiredEmployees { get; set; }
+    [Required] 
+    public int[] DesiredEmployees { get; set; } = [];
     /* Public properties for database */
     
     /* Navigation properties */
