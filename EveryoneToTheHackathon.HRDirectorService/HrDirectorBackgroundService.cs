@@ -8,7 +8,7 @@ public class HrDirectorBackgroundService(
     IBusControl busControl,
     ILogger<HrDirectorBackgroundService> logger,
     HrDirectorService hrDirectorService)
-    : BackgroundService, IConsumer<TeamsStored>
+    : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -31,18 +31,5 @@ public class HrDirectorBackgroundService(
         
         await busControl.Publish(new HackathonStarted(hrDirectorService.CurrHackathonId), stoppingToken);
         logger.LogInformation("HRDirector has announced start of the hackathon");
-    }
-    
-
-    public Task Consume(ConsumeContext<TeamsStored> context)
-    {
-        logger.LogInformation("HRManager has built {count} teams", context.Message.Count);
-        
-        var meanSatisfactionIndex = hrDirectorService.CalculationMeanSatisfactionIndex(hrDirectorService.CurrHackathonId);
-        logger.LogInformation("HRDirector has counted mean satisfaction index: {index}", meanSatisfactionIndex);
-        
-        Debug.Assert(hrDirectorService.HackathonFinished != null);
-        hrDirectorService.HackathonFinished.TrySetResult(true);
-        return Task.CompletedTask;
     }
 }

@@ -49,7 +49,7 @@ builder.Services.AddDbContextFactory<AppDbContext>(options =>
 
 builder.Services.AddMassTransit(x =>
 {
-    x.AddConsumer<EmployeeBackgroundService>();
+    x.AddConsumer<EmployeeConsumer>();
     x.UsingRabbitMq((context, cfg) =>
     {
         cfg.Host(new Uri("amqp://rabbitmq:5672/"));
@@ -74,11 +74,11 @@ builder.Services.AddSingleton<IHackathonRepository, HackathonRepository>();
 builder.Services.AddSingleton<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddSingleton<IWishlistRepository, WishlistRepository>();
 
+builder.Services.AddSingleton<EmployeeConsumer>();
 builder.Services.AddSingleton<EmployeeService>();
 
 builder.Services.AddHostedService<EmployeeBackgroundService>(e => 
     new EmployeeBackgroundService(
-        e.GetRequiredService<IBusControl>(),
         e.GetRequiredService<ILogger<EmployeeBackgroundService>>(),
         e.GetRequiredService<IHttpClientFactory>().CreateClient(nameof(EmployeeBackgroundService)),
         e.GetRequiredService<EmployeeService>()));

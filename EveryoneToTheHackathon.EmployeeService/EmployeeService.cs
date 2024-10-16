@@ -1,15 +1,19 @@
 using System.Diagnostics;
 using EveryoneToTheHackathon.Entities;
+using EveryoneToTheHackathon.Messages;
 using EveryoneToTheHackathon.Repositories;
+using MassTransit;
 using Microsoft.Extensions.Options;
 
 namespace EveryoneToTheHackathon.EmployeeService;
 
 public class EmployeeService(
+    ILogger<EmployeeBackgroundService> logger,
     IOptions<ServiceSettings> settings, 
     IHackathonRepository hackathonRepository, 
     IEmployeeRepository employeeRepository, 
-    IWishlistRepository wishlistRepository)
+    IWishlistRepository wishlistRepository,
+    IBusControl busControl)
 {
     public Employee Employee { get; } = settings.Value.Employee;
     public IEnumerable<Employee> ProbableTeammates { get; } = settings.Value.ProbableTeammates;
@@ -33,5 +37,16 @@ public class EmployeeService(
         ((List<Wishlist>)hackathon.Wishlists).Add(wishlist);
         
         EmployeeRepository.SaveEmployee(Employee, hackathon);
+    }
+    
+    public void SendEmployeeAndWishlistStoredAsyncViaMessage()
+    {
+        busControl.Publish(
+            new EmployeeAndWishlistSent($"Employee 'Id = {Employee.Id} " +
+                                        $"Title = {Employee.Title} " +
+                                        $"Name = {Employee.Name}' " +
+                                        $"has stored his data", 
+                Employee.Id, Employee.Title, Employee.Name));
+        logger.LogInformation("Employee has send his hackathon confirmation");
     }
 } 

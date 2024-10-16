@@ -8,11 +8,10 @@ using MassTransit;
 namespace EveryoneToTheHackathon.EmployeeService;
 
 public class EmployeeBackgroundService(
-    IBusControl busControl,
     ILogger<EmployeeBackgroundService> logger,
     HttpClient httpClient,
     EmployeeService employeeService)
-    : BackgroundService, IConsumer<HackathonStarted>
+    : BackgroundService
 {
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -35,34 +34,5 @@ public class EmployeeBackgroundService(
         var content = new StringContent(JsonSerializer.Serialize(wishlistDto), Encoding.UTF8, "application/json");
         var response = await httpClient.PostAsync(httpClient.BaseAddress + "api/hr_manager/wishlist", content, stoppingToken);
         response.EnsureSuccessStatusCode();
-    }
-    
-    private void SendEmployeeAndWishlistStoredAsyncViaMessage()
-    {
-        var employee = employeeService.Employee;
-        busControl.Publish(
-            new EmployeeAndWishlistSent($"Employee 'Id = {employee.Id} " +
-                                        $"Title = {employee.Title} " +
-                                        $"Name = {employee.Name}' " +
-                                        $"has stored his data", 
-                employee.Id, employee.Title, employee.Name));
-        logger.LogInformation("Employee has send his hackathon confirmation");
-    }
-
-    public Task Consume(ConsumeContext<HackathonStarted> context)
-    {
-        var hackathonId = context.Message.HackathonId;
-        
-        logger.LogInformation("Hackathon with id = {hackathonId} has started", hackathonId);
-        
-        var wishlist = employeeService.Employee.MakeWishlist(employeeService.ProbableTeammates);
-        
-        employeeService.SaveEmployeeAndWishlist(wishlist, hackathonId);
-        logger.LogInformation("Employee has stored his data");
-            
-        SendEmployeeAndWishlistStoredAsyncViaMessage();
-        
-        logger.LogInformation("Waiting for a hackathon to start");
-        return Task.CompletedTask;
     }
 }

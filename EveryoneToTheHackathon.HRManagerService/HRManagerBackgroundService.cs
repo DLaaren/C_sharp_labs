@@ -9,11 +9,10 @@ using MassTransit;
 namespace EveryoneToTheHackathon.HRManagerService;
 
 public class HrManagerBackgroundService(
-    IBusControl busControl,
     ILogger<HrManagerBackgroundService> logger,
     HttpClient httpClient,
     HrManagerService hrManagerService)
-    : BackgroundService, IConsumer<HackathonStarted>, IConsumer<EmployeeAndWishlistSent>
+    : BackgroundService
 {
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -54,44 +53,4 @@ public class HrManagerBackgroundService(
         await Task.CompletedTask;
     }
 
-    private void SendTeamsStoredAsyncViaMessage(int count)
-    {
-        busControl.Publish(
-            new TeamsStored(count));
-    }
-    
-    public async Task Consume(ConsumeContext<HackathonStarted> context)
-    {
-        hrManagerService.EmployeesAndWishlistsStored = new TaskCompletionSource<bool>();
-        hrManagerService.CurrHackathonId = context.Message.HackathonId;
-        logger.LogInformation("Hackathon with id = {hackathonId} has started", hrManagerService.CurrHackathonId);
-
-        await hrManagerService.EmployeesAndWishlistsStored.Task;
-        
-        hrManagerService.BuildTeamsAndSave(hrManagerService.CurrHackathonId);
-        logger.LogInformation("Teams has been stored");
-            
-        SendTeamsStoredAsyncViaMessage(hrManagerService.ReadyEmployeesCount / 2);
-
-        hrManagerService.CurrHackathonId = -1;
-        hrManagerService.ReadyEmployeesCount = 0;
-        logger.LogInformation("Waiting for a hackathon to start");
-        
-        await Task.CompletedTask;
-    }
-    
-   public Task Consume(ConsumeContext<EmployeeAndWishlistSent> context)
-   {
-       logger.LogInformation("Got message about stored Employee's with id = {id} title = {title} name = {name} data",
-           context.Message.Id, context.Message.Title, context.Message.Name);
-
-       hrManagerService.ReadyEmployeesCount += 1;
-       if (hrManagerService.ReadyEmployeesCount < hrManagerService.EmployeesNumber) return Task.CompletedTask;
-       
-       
-       Debug.Assert(hrManagerService.EmployeesAndWishlistsStored != null);
-       hrManagerService.EmployeesAndWishlistsStored.TrySetResult(true);
-
-       return Task.CompletedTask;
-   }
 }

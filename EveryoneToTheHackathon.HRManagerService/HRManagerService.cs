@@ -1,12 +1,15 @@
 using System.Diagnostics;
 using AutoMapper.Internal;
 using EveryoneToTheHackathon.Entities;
+using EveryoneToTheHackathon.Messages;
 using EveryoneToTheHackathon.Repositories;
+using MassTransit;
 using Microsoft.Extensions.Options;
 
 namespace EveryoneToTheHackathon.HRManagerService;
 
 public class HrManagerService(
+    IBusControl busControl,
     IOptions<ControllerSettings> settings, 
     HRManager hrManager, 
     IHackathonRepository hackathonRepository, 
@@ -55,5 +58,16 @@ public class HrManagerService(
         teams.ForEach(t => ((List<Employee>)t.Employees).ForEach(e => ((List<Team>)e.Teams).Add(t)));
 
         TeamRepository.SaveTeams(teams);
+    }
+
+    public int CheckNumberOfReadyEmployees(int hackathonId)
+    {
+        return employeeRepository.GetEmployeeByHackathonId(hackathonId).Count();
+    }
+    
+    public void SendTeamsStoredAsyncViaMessage(int count)
+    {
+        busControl.Publish(
+            new TeamsStored(count));
     }
 }

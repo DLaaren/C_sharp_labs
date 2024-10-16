@@ -43,7 +43,7 @@ builder.Services.AddDbContextFactory<AppDbContext>((provider, options) =>
 
 builder.Services.AddMassTransit(x =>
 {
-    x.AddConsumer<HrDirectorBackgroundService>();
+    x.AddConsumer<HrDirectorConsumer>();
     x.UsingRabbitMq((context, cfg) =>
     {
         cfg.Host(new Uri("amqp://rabbitmq:5672/"));
@@ -69,7 +69,7 @@ builder.Services.AddSingleton<IWishlistRepository, WishlistRepository>();
 builder.Services.AddSingleton<ITeamRepository, TeamRepository>();
 
 builder.Services.AddSingleton<HRDirector>();
-
+builder.Services.AddSingleton<HrDirectorConsumer>();
 builder.Services.AddSingleton<HrDirectorService>();
 
 builder.Services.AddHostedService<HrDirectorBackgroundService>();

@@ -40,7 +40,7 @@ builder.Services.AddDbContextFactory<AppDbContext>(options =>
 
 builder.Services.AddMassTransit(x =>
 {
-    x.AddConsumer<HrManagerBackgroundService>();
+    x.AddConsumer<HrManagerConsumer>();
     x.UsingRabbitMq((context, cfg) =>
     {
         cfg.Host(new Uri("amqp://rabbitmq:5672/"));
@@ -63,12 +63,11 @@ builder.Services.AddSingleton<IWishlistRepository, WishlistRepository>();
 builder.Services.AddSingleton<ITeamRepository, TeamRepository>();
 
 builder.Services.AddSingleton<HRManager>(_ => new HRManager(new ProposeAndRejectAlgorithm()));
-
+builder.Services.AddSingleton<HrManagerConsumer>();
 builder.Services.AddSingleton<HrManagerService>();
 
 builder.Services.AddHostedService<HrManagerBackgroundService>(s => 
     new HrManagerBackgroundService(
-        s.GetRequiredService<IBusControl>(),
         s.GetRequiredService<ILogger<HrManagerBackgroundService>>(),
         s.GetRequiredService<IHttpClientFactory>().CreateClient(nameof(HrManagerBackgroundService)),
         s.GetRequiredService<HrManagerService>()));
