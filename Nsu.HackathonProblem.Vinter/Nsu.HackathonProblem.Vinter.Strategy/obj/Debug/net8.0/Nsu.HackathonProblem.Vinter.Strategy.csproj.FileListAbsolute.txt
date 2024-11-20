@@ -1,0 +1,15 @@
+/home/dlaaren/RiderProjects/Nsu.HackathonProblem.Vinter/Nsu.HackathonProblem.Vinter.Strategy/bin/Debug/net8.0/Nsu.HackathonProblem.Vinter.Strategy.deps.json
+/home/dlaaren/RiderProjects/Nsu.HackathonProblem.Vinter/Nsu.HackathonProblem.Vinter.Strategy/bin/Debug/net8.0/Nsu.HackathonProblem.Vinter.Strategy.dll
+/home/dlaaren/RiderProjects/Nsu.HackathonProblem.Vinter/Nsu.HackathonProblem.Vinter.Strategy/bin/Debug/net8.0/Nsu.HackathonProblem.Vinter.Strategy.pdb
+/home/dlaaren/RiderProjects/Nsu.HackathonProblem.Vinter/Nsu.HackathonProblem.Vinter.Strategy/bin/Debug/net8.0/Nsu.HackathonProblem.Contracts.dll
+/home/dlaaren/RiderProjects/Nsu.HackathonProblem.Vinter/Nsu.HackathonProblem.Vinter.Strategy/bin/Debug/net8.0/Nsu.HackathonProblem.Contracts.pdb
+/home/dlaaren/RiderProjects/Nsu.HackathonProblem.Vinter/Nsu.HackathonProblem.Vinter.Strategy/obj/Debug/net8.0/Nsu.HackathonProblem.Vinter.Strategy.csproj.AssemblyReference.cache
+/home/dlaaren/RiderProjects/Nsu.HackathonProblem.Vinter/Nsu.HackathonProblem.Vinter.Strategy/obj/Debug/net8.0/Nsu.HackathonProblem.Vinter.Strategy.GeneratedMSBuildEditorConfig.editorconfig
+/home/dlaaren/RiderProjects/Nsu.HackathonProblem.Vinter/Nsu.HackathonProblem.Vinter.Strategy/obj/Debug/net8.0/Nsu.HackathonProblem.Vinter.Strategy.AssemblyInfoInputs.cache
+/home/dlaaren/RiderProjects/Nsu.HackathonProblem.Vinter/Nsu.HackathonProblem.Vinter.Strategy/obj/Debug/net8.0/Nsu.HackathonProblem.Vinter.Strategy.AssemblyInfo.cs
+/home/dlaaren/RiderProjects/Nsu.HackathonProblem.Vinter/Nsu.HackathonProblem.Vinter.Strategy/obj/Debug/net8.0/Nsu.HackathonProblem.Vinter.Strategy.csproj.CoreCompileInputs.cache
+/home/dlaaren/RiderProjects/Nsu.HackathonProblem.Vinter/Nsu.HackathonProblem.Vinter.Strategy/obj/Debug/net8.0/Nsu.HackathonProblem.Vinter.Strategy.csproj.CopyComplete
+/home/dlaaren/RiderProjects/Nsu.HackathonProblem.Vinter/Nsu.HackathonProblem.Vinter.Strategy/obj/Debug/net8.0/Nsu.HackathonProblem.Vinter.Strategy.dll
+/home/dlaaren/RiderProjects/Nsu.HackathonProblem.Vinter/Nsu.HackathonProblem.Vinter.Strategy/obj/Debug/net8.0/refint/Nsu.HackathonProblem.Vinter.Strategy.dll
+/home/dlaaren/RiderProjects/Nsu.HackathonProblem.Vinter/Nsu.HackathonProblem.Vinter.Strategy/obj/Debug/net8.0/Nsu.HackathonProblem.Vinter.Strategy.pdb
+/home/dlaaren/RiderProjects/Nsu.HackathonProblem.Vinter/Nsu.HackathonProblem.Vinter.Strategy/obj/Debug/net8.0/ref/Nsu.HackathonProblem.Vinter.Strategy.dll

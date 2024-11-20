@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "LK97DsGd0a8=",
+  "success": true,
+  "projectFilePath": "/home/dlaaren/RiderProjects/Nsu.HackathonProblem.Vinter/Nsu.HackathonProblem.Vinter.Strategy/Nsu.HackathonProblem.Vinter.Strategy.csproj",
+  "expectedPackageFiles": [
+    "/home/dlaaren/.nuget/packages/microsoft.aspnetcore.app.ref/8.0.8/microsoft.aspnetcore.app.ref.8.0.8.nupkg.sha512"
+  ],
+  "logs": []
+}

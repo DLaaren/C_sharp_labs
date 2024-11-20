@@ -1,0 +1,130 @@
+{
+  "format": 1,
+  "restore": {
+    "/home/dlaaren/RiderProjects/Nsu.HackathonProblem.Vinter/Nsu.HackathonProblem.Vinter.Strategy/Nsu.HackathonProblem.Vinter.Strategy.csproj": {}
+  },
+  "projects": {
+    "/home/dlaaren/RiderProjects/Nsu.HackathonProblem.Contracts/Nsu.HackathonProblem.Contracts/Nsu.HackathonProblem.Contracts.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/dlaaren/RiderProjects/Nsu.HackathonProblem.Contracts/Nsu.HackathonProblem.Contracts/Nsu.HackathonProblem.Contracts.csproj",
+        "projectName": "Nsu.HackathonProblem.Contracts",
+        "projectPath": "/home/dlaaren/RiderProjects/Nsu.HackathonProblem.Contracts/Nsu.HackathonProblem.Contracts/Nsu.HackathonProblem.Contracts.csproj",
+        "packagesPath": "/home/dlaaren/.nuget/packages/",
+        "outputPath": "/home/dlaaren/RiderProjects/Nsu.HackathonProblem.Contracts/Nsu.HackathonProblem.Contracts/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/dlaaren/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.8, 8.0.8]"
+            }
+          ],
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/8.0.108/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/home/dlaaren/RiderProjects/Nsu.HackathonProblem.Vinter/Nsu.HackathonProblem.Vinter.Strategy/Nsu.HackathonProblem.Vinter.Strategy.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/dlaaren/RiderProjects/Nsu.HackathonProblem.Vinter/Nsu.HackathonProblem.Vinter.Strategy/Nsu.HackathonProblem.Vinter.Strategy.csproj",
+        "projectName": "Nsu.HackathonProblem.Vinter.Strategy",
+        "projectPath": "/home/dlaaren/RiderProjects/Nsu.HackathonProblem.Vinter/Nsu.HackathonProblem.Vinter.Strategy/Nsu.HackathonProblem.Vinter.Strategy.csproj",
+        "packagesPath": "/home/dlaaren/.nuget/packages/",
+        "outputPath": "/home/dlaaren/RiderProjects/Nsu.HackathonProblem.Vinter/Nsu.HackathonProblem.Vinter.Strategy/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/dlaaren/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "/home/dlaaren/RiderProjects/Nsu.HackathonProblem.Contracts/Nsu.HackathonProblem.Contracts/Nsu.HackathonProblem.Contracts.csproj": {
+                "projectPath": "/home/dlaaren/RiderProjects/Nsu.HackathonProblem.Contracts/Nsu.HackathonProblem.Contracts/Nsu.HackathonProblem.Contracts.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.8, 8.0.8]"
+            }
+          ],
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/8.0.108/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
