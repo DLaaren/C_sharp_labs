@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using Nsu.HackathonProblem.Contracts;
 
 namespace Nsu.HackathonProblem.Vinter.Strategy;
@@ -185,8 +184,6 @@ public class ProposeAndRejectAlgorithm : ITeamBuildingStrategy
         var result1 = CountSatisfactionIndex(teamLeadsList, juniorsList, teamLeadsWishlistsList, juniorsWishlistsList, teams1);
         var result2 = CountSatisfactionIndex(teamLeadsList, juniorsList, teamLeadsWishlistsList, juniorsWishlistsList, teams2);
 
-        Console.Out.WriteLine(result1 + " " + result2);
-        
         return result1 >= result2 ? teams1 : teams2;
     }
 }
