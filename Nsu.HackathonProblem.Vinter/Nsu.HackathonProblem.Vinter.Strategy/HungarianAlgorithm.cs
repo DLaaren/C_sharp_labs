@@ -15,7 +15,14 @@ public class HungarianAlgorithm : ITeamBuildingStrategy
         var juniorsWishlistsList = new List<Wishlist>(juniorsWishlists);
 
         var teams = PerformAlgorithm(teamLeadsList, juniorsList, teamLeadsWishlistsList, juniorsWishlistsList);
+        
+        for (var teamIndex = 0; teamIndex < teams.Count; teamIndex++)
+        {
+            Console.Out.WriteLine($"TeamLead: {teams[teamIndex].TeamLead.Id} -> Junior: {teams[teamIndex].Junior.Id}");
+        }
 
+        Console.Out.WriteLine();
+        
         return teams;
     }
 
@@ -43,6 +50,7 @@ public class HungarianAlgorithm : ITeamBuildingStrategy
             var junior = juniors.Find(jun => jun.Id == j + 1)!;
             teams.Add(new Team(teamlead, junior));
         }
+
         return teams;
     }
 
@@ -53,7 +61,6 @@ public class HungarianAlgorithm : ITeamBuildingStrategy
         var rowsGreaterThanCols = h > w;
         if (rowsGreaterThanCols)
         {
-            // make sure cost matrix has number of rows greater than columns
             var row = w;
             var col = h;
             var transposeCosts = new int [row, col];

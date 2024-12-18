@@ -4,8 +4,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nsu.HackathonProblem.Vinter
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nsu.HackathonProblem.Contracts", "..\Nsu.HackathonProblem.Contracts\Nsu.HackathonProblem.Contracts\Nsu.HackathonProblem.Contracts.csproj", "{DF57540B-31DF-4651-BDDC-C8023942EF0D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nsu.HackathonProblem.CheckStrategy", "Nsu.HackathonProblem.CheckStrategy\Nsu.HackathonProblem.CheckStrategy.csproj", "{F113E3B1-B326-4683-9E2C-F30923AA2903}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,9 +18,5 @@ Global
 		{DF57540B-31DF-4651-BDDC-C8023942EF0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DF57540B-31DF-4651-BDDC-C8023942EF0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DF57540B-31DF-4651-BDDC-C8023942EF0D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F113E3B1-B326-4683-9E2C-F30923AA2903}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F113E3B1-B326-4683-9E2C-F30923AA2903}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F113E3B1-B326-4683-9E2C-F30923AA2903}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F113E3B1-B326-4683-9E2C-F30923AA2903}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
